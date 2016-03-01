@@ -13,7 +13,9 @@
     "electron-prebuilt": "^0.36.9"
   },
   "dependencies": {
+    "bluebird": "^3.3.3",
     "jquery": "^2.2.1",
+    "request-json": "^0.5.5",
     "titlebar": "^1.4.0"
   }
 }

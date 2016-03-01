@@ -1,12 +1,14 @@
 'use strict';
 
 const electron = require('electron');
+const dialog = require('electron').dialog;
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const ipcMain = require('electron').ipcMain; // ipc main reference.
+const api_key = require('./config.json').RIOT_API_KEY;
 
 // Load data from Riot APIs when we start the application.
-const Champions = require("API/Champions");
+const APIData = new (require("./API/APIData"))(api_key);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -43,6 +45,17 @@ app.on('ready', function() {
 
   mainWindow.webContents.on('did-finish-load', function(){
     mainWindow.show();
+    //begin loading API data.
+    APIData.loadAll(function(index, length) {
+      var percent = index/length;
+      mainWindow.webContents.send('updateProgressBar', percent);
+    }).then(function() {
+      mainWindow.webContents.send('finishedLoading', true);
+    }, function(error) {
+      dialog.showErrorBox("Error!", error.toString()); //TODO: Handle errors better.
+    }).catch(function(error) {
+      dialog.showErrorBox("Caught Exception!", error.toString()); //TODO: Handle errors better.
+    });
   });
 
   // Emitted when the window is closed.

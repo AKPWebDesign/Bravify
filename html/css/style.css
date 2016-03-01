@@ -16,3 +16,26 @@ html, body {
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
 }
+
+.champ-frame, .start-frame {
+  display: none;
+}
+
+.loading-frame {
+  position: absolute;
+  width: 90%;
+  text-align: center;
+  color: white;
+  background-color: rgba(10,10,10,0.8);
+  border-radius: 15px;
+  padding: 20px 0;
+}
+
+.loading-frame progress {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.loading-frame progress[value]::-webkit-progress-value {
+  transition: width 1.25s ease-in-out;
+}
