@@ -1,0 +1,18 @@
+html, body {
+  background-image: url("../img/teambuilder-wallpaper.jpg");
+  background-repeat:no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+.titlebar-container {
+  box-sizing: content-box;
+}
+
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}

@@ -1,0 +1,19 @@
+{
+  "name": "ultimate-bravery-build-generator",
+  "version": "0.0.1",
+  "description": "Creates a random Ultimate Bravery build for a champion in League of Legends, adding it to the proper folder for it to be loaded in game.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Austin Peterson <austin@akpwebdesign.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "devDependencies": {
+    "asar": "^0.10.0",
+    "electron-prebuilt": "^0.36.9"
+  },
+  "dependencies": {
+    "jquery": "^2.2.1",
+    "titlebar": "^1.4.0"
+  }
+}
