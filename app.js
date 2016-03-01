@@ -67,6 +67,11 @@ app.on('ready', function() {
   });
 });
 
+// Called when the client requests a new build to be generated
+ipcMain.on('generateNewBuild', function() {
+  
+});
+
 // The methods below will be called upon receiving various messages from our
 // rendering thread. These are used to do things in the app when the user clicks
 // on things in the interface.
