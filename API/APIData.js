@@ -29,6 +29,10 @@ function APIData(api_key) {
     "GangplankRUpgrade01",
     "GangplankRUpgrade02",
     "GangplankRUpgrade03"
+  ];
+
+  this.badItemNames = [
+    "Cull"
   ]
 }
 
@@ -52,7 +56,13 @@ APIData.prototype.loadAll = function (progressFunction) {
     }
     for (var key in self.items) {
       if (self.items.hasOwnProperty(key)) {
-        self.itemKeyArray.push(key);
+        //check item to be sure it's not in a disallowed group
+        if(!(self.items[key].group && self.badItemGroups.includes(self.items[key].group))) {
+          //check item to be sure it's not got a disallowed name.
+          if(!self.badItemNames.includes(self.items[key].name)) {
+            self.itemKeyArray.push(key);
+          }
+        }
       }
     }
     progressFunction(1, 1);

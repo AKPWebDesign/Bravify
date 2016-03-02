@@ -9,6 +9,7 @@ const api_key = require('./config.json').RIOT_API_KEY;
 
 // Load data from Riot APIs when we start the application.
 const APIData = new (require("./API/APIData"))(api_key);
+const BuildGenerator = new (require("./API/BuildGenerator"))(APIData);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -41,7 +42,7 @@ app.on('ready', function() {
   mainWindow.loadURL('file://' + __dirname + '/html/index.html');
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools(); //or not.
+  mainWindow.webContents.openDevTools(); //or not.
 
   mainWindow.webContents.on('did-finish-load', function(){
     mainWindow.show();
@@ -69,7 +70,15 @@ app.on('ready', function() {
 
 // Called when the client requests a new build to be generated
 ipcMain.on('generateNewBuild', function() {
-  
+  console.log("Generating new build!");
+  BuildGenerator.generate(11).then(function(result) { //TODO: Get map value from UI. Currently hard-coded to Rift.
+    for (var i = 0; i < result.items.length; i++) {
+      console.log(result.items[i].name, result.items[i].group, result.items[i].into);
+    }
+    mainWindow.webContents.send("buildGenerated", result);
+  },function(error) {
+    console.log(error);
+  });
 });
 
 // The methods below will be called upon receiving various messages from our
