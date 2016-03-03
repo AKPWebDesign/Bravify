@@ -1,9 +1,8 @@
 var request = require('request-json');
-var client = request.createClient("https://global.api.pvp.net");
+var client = request.createClient("http://lol-static-data.akpwebdesign.com/");
 var Promise = require("bluebird");
 
-function APIData(api_key) {
-  this.api_key = api_key;
+function APIData() {
   this.versionData = {};
   this.champs = {};
   this.champKeyArray = [];
@@ -76,9 +75,8 @@ APIData.prototype.loadAll = function (progressFunction) {
 APIData.prototype.loadVersionData = function (region, version) {
   var self = this;
   return new Promise(function(resolve, reject) {
-    client.get(`/api/lol/static-data/${region}/${version}/realm?api_key=${self.api_key}`, function(err, res, body){
-      if(err) {reject(err); return;}
-      if(body.status && body.status.status_code !== 200) {reject(body); return;}
+    client.get(`/versions`, function(err, res, body){
+      if(err || (body.status && body.status == "Error")) {reject(body); return;}
       self.versionData = body;
       resolve("Version Data loaded successfully.");
     });
@@ -88,10 +86,9 @@ APIData.prototype.loadVersionData = function (region, version) {
 APIData.prototype.loadChamps = function (region, version) {
   var self = this;
   return new Promise(function(resolve, reject) {
-    client.get(`/api/lol/static-data/${region}/${version}/champion?champData=all&api_key=${self.api_key}`, function(err, res, body){
-      if(err) {reject(err); return;}
-      if(body.status && body.status.status_code !== 200) {reject(body); return;}
-      self.champs = body.data;
+    client.get(`/champs`, function(err, res, body){
+      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      self.champs = body;
       resolve("Champ Data loaded successfully.");
     });
   });
@@ -100,10 +97,9 @@ APIData.prototype.loadChamps = function (region, version) {
 APIData.prototype.loadItems = function (region, version) {
   var self = this;
   return new Promise(function(resolve, reject) {
-    client.get(`/api/lol/static-data/${region}/${version}/item?itemListData=all&api_key=${self.api_key}`, function(err, res, body){
-      if(err) {reject(err); return;}
-      if(body.status && body.status.status_code !== 200) {reject(body); return;}
-      self.items = body.data;
+    client.get(`/items`, function(err, res, body){
+      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      self.items = body;
       resolve("Item Data loaded successfully.");
     });
   });
@@ -112,10 +108,9 @@ APIData.prototype.loadItems = function (region, version) {
 APIData.prototype.loadMaps = function (region, version) {
   var self = this;
   return new Promise(function(resolve, reject) {
-    client.get(`/api/lol/static-data/${region}/${version}/map?api_key=${self.api_key}`, function(err, res, body){
-      if(err) {reject(err); return;}
-      if(body.status && body.status.status_code !== 200) {reject(body); return;}
-      self.maps = body.data; //TODO: associate lanes with maps, eg: treeline = top/bottom/jung, rift = top/mid/bottom/jung.
+    client.get(`/maps`, function(err, res, body){
+      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      self.maps = body; //TODO: associate lanes with maps, eg: treeline = top/bottom/jung, rift = top/mid/bottom/jung.
       resolve("Map Data loaded successfully.");
     });
   });
@@ -124,10 +119,9 @@ APIData.prototype.loadMaps = function (region, version) {
 APIData.prototype.loadMasteries = function (region, version) {
   var self = this;
   return new Promise(function(resolve, reject) {
-    client.get(`/api/lol/static-data/${region}/${version}/mastery?masteryListData=all&api_key=${self.api_key}`, function(err, res, body){
-      if(err) {reject(err); return;}
-      if(body.status && body.status.status_code !== 200) {reject(body); return;}
-      self.masteries = body.data;
+    client.get(`/masteries`, function(err, res, body){
+      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      self.masteries = body;
       resolve("Mastery Data loaded successfully.");
     });
   });
@@ -136,10 +130,9 @@ APIData.prototype.loadMasteries = function (region, version) {
 APIData.prototype.loadSummonerSpells = function (region, version) {
   var self = this;
   return new Promise(function(resolve, reject) {
-    client.get(`/api/lol/static-data/${region}/${version}/summoner-spell?spellData=all&api_key=${self.api_key}`, function(err, res, body){
-      if(err) {reject(err); return;}
-      if(body.status && body.status.status_code !== 200) {reject(body); return;}
-      self.summonerSpells = body.data;
+    client.get(`/spells`, function(err, res, body){
+      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      self.summonerSpells = body;
       resolve("Summoner Spell Data loaded successfully.");
     });
   });

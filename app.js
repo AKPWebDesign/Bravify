@@ -5,10 +5,9 @@ const dialog = require('electron').dialog;
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const ipcMain = require('electron').ipcMain; // ipc main reference.
-const api_key = require('./config.json').RIOT_API_KEY;
 
 // Load data from Riot APIs when we start the application.
-const APIData = new (require("./API/APIData"))(api_key);
+const APIData = new (require("./API/APIData"))();
 const BuildGenerator = new (require("./API/BuildGenerator"))(APIData);
 
 // Keep a global reference of the window object, if you don't, the window will
