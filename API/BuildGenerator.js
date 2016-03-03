@@ -9,12 +9,12 @@ BuildGenerator.prototype.generate = function (map) {
   return new Promise(function(resolve, reject) {
     var champ = self.genChamp();
     var items = self.genItems(champ.name, map);
-    resolve({items: items});
+    resolve({champ: champ, items: items, versions: self.APIData.versionData});
   });
 };
 
 BuildGenerator.prototype.genChamp = function () {
-  return {"name": "Vi"}; //lol
+  return this.APIData.champs.Vi; //lol
 };
 
 BuildGenerator.prototype.genItems = function (champion, map) {

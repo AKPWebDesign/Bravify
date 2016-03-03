@@ -21,6 +21,12 @@ html, body {
   display: none;
 }
 
+.champ-icon {
+  max-width: 120px;
+  max-height: 120px;
+  border: gold 2px solid;
+}
+
 .loading-frame {
   position: absolute;
   width: 90%;
