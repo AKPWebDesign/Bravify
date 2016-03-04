@@ -29,17 +29,28 @@ html, body {
           transform: translate(-50%, -50%);
 }
 
-.champ-frame, .start-frame {
+.champ-frame {
   display: none;
 }
 
-.build div {
+.build-container {
+  width: 90%;
+}
+
+.build {
   color: white;
   font-size: 45px;
+  padding: 25px;
+  background-color: rgba(10,10,10,0.8);
+  border-radius: 15px;
 }
 
 .champ-info, .items-info {
   float: left;
+}
+
+.items-info {
+  margin-left: 15px;
 }
 
 .champ-icon {
@@ -61,7 +72,7 @@ html, body {
   margin-right: 8px !important;
 }
 
-.loading-frame, .build {
+.loading-frame {
   position: absolute;
   width: 90%;
   text-align: center;
@@ -69,11 +80,6 @@ html, body {
   background-color: rgba(10,10,10,0.8);
   border-radius: 15px;
   padding: 20px 0;
-}
-
-.build {
-  width: 50%;
-  padding: 25px;
 }
 
 .loading-frame progress {

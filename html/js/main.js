@@ -19,11 +19,6 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   $('.spells div').tooltip();
 
   $('.build-name').text('STUPID ' + champ.name.toUpperCase());
-
-  $('.app-container').imagesLoaded(function() {
-    $('.start-frame').fadeOut(500);
-    $('.champ-frame').fadeIn(1000);
-  });
 });
 
 function buildBackgroundImageURL(url) {

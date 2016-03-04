@@ -10,7 +10,8 @@ BuildGenerator.prototype.generate = function (map) {
   return new Promise(function(resolve, reject) {
     var champ = self.genChamp();
     var items = self.genItems(champ.name, map);
-    resolve({champ: champ, items: items, spells: self.genSpells(), versions: self.APIData.versionData});
+    //TODO: Pull mode to use from UI.
+    resolve({champ: champ, items: items, spells: self.genSpells("CLASSIC"), versions: self.APIData.versionData});
   });
 };
 
@@ -18,8 +19,9 @@ BuildGenerator.prototype.genChamp = function () {
   return this.APIData.champs[chance.pickone(this.APIData.champKeys)];
 };
 
-BuildGenerator.prototype.genSpells = function () {
-  return chance.pickset(this.APIData.summonerSpellKeys, 2).map(s => this.APIData.summonerSpells[s]);
+BuildGenerator.prototype.genSpells = function (mode) {
+  var set = chance.pickset(this.APIData.summonerSpellKeys[mode], 2);
+  return set.map(s => this.APIData.summonerSpells[s]);
 };
 
 BuildGenerator.prototype.genItems = function (champion, map) {

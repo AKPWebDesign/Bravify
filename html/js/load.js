@@ -3,10 +3,11 @@ ipcRenderer.on('updateProgressBar', function(event, message) {
 });
 
 ipcRenderer.on('finishedLoading', function(event, message) {
+  ipcRenderer.send('generateNewBuild');
   if(message == true) {
     setTimeout(function(){
       $('.loading-frame').fadeOut(1000);
-      $('.start-frame').fadeIn(1000);
+      $('.champ-frame').fadeIn(1000);
     }, 1250);
   }
 });

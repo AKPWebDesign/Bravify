@@ -11,7 +11,9 @@ function APIData() {
   this.maps = {};
   this.masteries = {}
   this.summonerSpells = {};
-  this.summonerSpellKeys = [];
+  this.summonerSpellKeys = {};
+
+  this.itemsAsTags = {};
 
   this.badItemGroups = [
     "BootsNormal",
@@ -33,7 +35,14 @@ function APIData() {
 
   this.badItemNames = [
     "Cull"
-  ]
+  ];
+
+  this.badItemTags = [
+    "Boots",
+    "Jungle",
+    "Trinket",
+    "Consumable"
+  ];
 }
 
 APIData.prototype.loadAll = function (progressFunction) {
@@ -91,15 +100,35 @@ APIData.prototype.loadItems = function (region, version) {
       self.items = body;
       for (var key in body) {
         if (body.hasOwnProperty(key)) {
+          if(body[key].tags) {
+            for (var i = 0; i < body[key].tags.length; i++) {
+              var tag = body[key].tags[i];
+              if(!self.itemsAsTags[tag]) {self.itemsAsTags[tag] = []};
+              self.itemsAsTags[tag].push(body[key]);
+            }
+          }
+
           //check item to be sure it's not in a disallowed group
           if(!(body[key].group && self.badItemGroups.includes(body[key].group))) {
             //check item to be sure it's not got a disallowed name.
             if(!self.badItemNames.includes(body[key].name)) {
-              self.itemKeys.push(key);
+              //check item to be sure it doesn't have a disallowed tag.
+              if(body[key].tags) {
+                var bad = false;
+                for (var i = 0; i < body[key].tags.length; i++) {
+                  if(self.badItemTags.includes(body[key].tags[i])) {
+                    bad = true;
+                  }
+                }
+                if(!bad) {self.itemKeys.push(key);}
+              } else {
+                self.itemKeys.push(key);
+              }
             }
           }
         }
       }
+      console.log(self.itemsAsTags);
       resolve("Item Data loaded successfully.");
     });
   });
@@ -135,9 +164,16 @@ APIData.prototype.loadSummonerSpells = function (region, version) {
       self.summonerSpells = body;
       for(var key in body) {
         if(body.hasOwnProperty(key)) {
-          self.summonerSpellKeys.push(key);
+          for (var i = 0; i < body[key].modes.length; i++) {
+            var mode = body[key].modes[i];
+            if(!self.summonerSpellKeys[mode]) {
+              self.summonerSpellKeys[mode] = [];
+            }
+            self.summonerSpellKeys[mode].push(key);
+          }
         }
       }
+      //console.log(self.summonerSpellKeys);
       resolve("Summoner Spell Data loaded successfully.");
     });
   });
