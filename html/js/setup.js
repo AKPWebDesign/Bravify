@@ -2,6 +2,7 @@
 window.$ = window.jQuery = require('jquery');
 const ipcRenderer = require('electron').ipcRenderer;
 const remote = require('electron').remote;
+const imagesLoaded = require('imagesloaded');
 
 //set up titlebar when document is ready.
 $(document).ready(function(){

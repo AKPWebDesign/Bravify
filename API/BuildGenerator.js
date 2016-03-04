@@ -14,7 +14,8 @@ BuildGenerator.prototype.generate = function (map) {
 };
 
 BuildGenerator.prototype.genChamp = function () {
-  return this.APIData.champs.Vi; //lol
+  var champKey = this.APIData.champKeyArray[Math.floor(Math.random()*this.APIData.champKeyArray.length)];
+  return this.APIData.champs[champKey];
 };
 
 BuildGenerator.prototype.genItems = function (champion, map) {
@@ -42,7 +43,7 @@ BuildGenerator.prototype.genItems = function (champion, map) {
   return items;
 };
 
-BuildGenerator.prototype.newItem = function (map) {
+BuildGenerator.prototype.newItem = function (map, group) {
   var done = false;
   var currentItem = null;
   var items = this.APIData.itemKeyArray;

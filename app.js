@@ -35,13 +35,11 @@ app.on('ready', function() {
     //resizable: false, //TODO: consider if we should disable resizing or not.
     show: false,
     frame: false,
+    transparent: true,
     title: 'Bravify'});
 
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/html/index.html');
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools(); //or not.
 
   mainWindow.webContents.on('did-finish-load', function(){
     mainWindow.show();
