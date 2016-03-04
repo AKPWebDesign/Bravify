@@ -128,7 +128,6 @@ APIData.prototype.loadItems = function (region, version) {
           }
         }
       }
-      console.log(self.itemsAsTags);
       resolve("Item Data loaded successfully.");
     });
   });
