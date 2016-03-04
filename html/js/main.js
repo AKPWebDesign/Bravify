@@ -10,6 +10,8 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   $('.champ-icon').css("background-image", buildBackgroundImageURL(baseImageURL + 'champion/' + champ.image.full));
   $('.app-container').css("background-image", buildBackgroundImageURL(artImageURL + 'splash/' + champ.key + "_0.jpg"));
 
+  $('.build-name').text('SHITTY ' + champ.name.toUpperCase());
+
   $('.app-container').imagesLoaded(function() {
     $('.start-frame').fadeOut(500);
     $('.champ-frame').fadeIn(1000);

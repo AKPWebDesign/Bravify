@@ -30,9 +30,11 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({
     width: 1050,
     height: 600,
+    'min-width': 1050,
+    'min-height': 600,
     fullscreen: false,
     center: true,
-    //resizable: false, //TODO: consider if we should disable resizing or not.
+    resizable: true,
     show: false,
     frame: false,
     transparent: true,
