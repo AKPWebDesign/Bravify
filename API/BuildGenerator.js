@@ -1,4 +1,5 @@
 var Promise = require("bluebird");
+var chance = new (require("chance"))();
 
 function BuildGenerator(APIData) {
   this.APIData = APIData;
@@ -9,13 +10,16 @@ BuildGenerator.prototype.generate = function (map) {
   return new Promise(function(resolve, reject) {
     var champ = self.genChamp();
     var items = self.genItems(champ.name, map);
-    resolve({champ: champ, items: items, versions: self.APIData.versionData});
+    resolve({champ: champ, items: items, spells: self.genSpells(), versions: self.APIData.versionData});
   });
 };
 
 BuildGenerator.prototype.genChamp = function () {
-  var champKey = this.APIData.champKeyArray[Math.floor(Math.random()*this.APIData.champKeyArray.length)];
-  return this.APIData.champs[champKey];
+  return this.APIData.champs[chance.pickone(this.APIData.champKeys)];
+};
+
+BuildGenerator.prototype.genSpells = function () {
+  return chance.pickset(this.APIData.summonerSpellKeys, 2).map(s => this.APIData.summonerSpells[s]);
 };
 
 BuildGenerator.prototype.genItems = function (champion, map) {
@@ -46,21 +50,21 @@ BuildGenerator.prototype.genItems = function (champion, map) {
 BuildGenerator.prototype.newItem = function (map, group) {
   var done = false;
   var currentItem = null;
-  var items = this.APIData.itemKeyArray;
+  var items = this.APIData.itemKeys;
   while(!done) {
     if(currentItem) {
       if(!this.APIData.items[currentItem]) {
         currentItem = null;
-        items = this.APIData.itemKeyArray;
+        items = this.APIData.itemKeys;
       } else {
         items = this.APIData.items[currentItem].into;
       }
     } else {
-      items = this.APIData.itemKeyArray;
+      items = this.APIData.itemKeys;
     }
 
     if(items) {
-      currentItem = items[Math.floor(Math.random()*items.length)];
+      currentItem = chance.pickone(items);
     } else {
       //check map, make sure we can use this item on the map we selected.
       if(!this.APIData.items[currentItem].maps[map]) {

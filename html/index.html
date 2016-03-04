@@ -19,12 +19,9 @@
       <div class='build centered'>
         <div class="champ-info">
           <div class="champ-icon"></div>
-          <div class="spells">
-            <div class="levelUp"></div>
-            <div class="spell1"></div>
-            <div class="spell2"></div>
-          </div>
-          <div class="masteries">18/0/12</div>
+          <div class="spells"></div>
+          <!-- <div class="levelUp"></div> -->
+          <!-- <div class="masteries">18/0/12</div> -->
         </div>
         <div class="items-info">
           <div class="build-name">SHITTY VI</div>
@@ -38,5 +35,8 @@
   <script src="js/tooltips.js"></script>
   <script src="js/load.js"></script>
   <script src="js/main.js"></script>
+  <script id="spell-template" type="text/x-handlebars-template">
+    <div class="spell" data-toggle="tooltip" title="{{title}}" style="background-image: url({{url}})"></div>
+  </script>
 </body>
 </html>

@@ -5,12 +5,13 @@ var Promise = require("bluebird");
 function APIData() {
   this.versionData = {};
   this.champs = {};
-  this.champKeyArray = [];
+  this.champKeys = [];
   this.items = {};
-  this.itemKeyArray = [];
+  this.itemKeys = [];
   this.maps = {};
   this.masteries = {}
   this.summonerSpells = {};
+  this.summonerSpellKeys = [];
 
   this.badItemGroups = [
     "BootsNormal",
@@ -47,23 +48,6 @@ APIData.prototype.loadAll = function (progressFunction) {
                  progressFunction(index, length);
                })
   .then(function(result){
-    //if all data is loaded, prepare key arrays.
-    for (var key in self.champs) {
-      if (self.champs.hasOwnProperty(key)) {
-        self.champKeyArray.push(key);
-      }
-    }
-    for (var key in self.items) {
-      if (self.items.hasOwnProperty(key)) {
-        //check item to be sure it's not in a disallowed group
-        if(!(self.items[key].group && self.badItemGroups.includes(self.items[key].group))) {
-          //check item to be sure it's not got a disallowed name.
-          if(!self.badItemNames.includes(self.items[key].name)) {
-            self.itemKeyArray.push(key);
-          }
-        }
-      }
-    }
     progressFunction(1, 1);
   }, function(error){
     //if any data errors, we come here.
@@ -89,6 +73,11 @@ APIData.prototype.loadChamps = function (region, version) {
     client.get(`/champs`, function(err, res, body){
       if(err || (body.status && body.status == "Error")) {reject(body); return;}
       self.champs = body;
+      for (var key in body) {
+        if (body.hasOwnProperty(key)) {
+          self.champKeys.push(key);
+        }
+      }
       resolve("Champ Data loaded successfully.");
     });
   });
@@ -100,6 +89,17 @@ APIData.prototype.loadItems = function (region, version) {
     client.get(`/items`, function(err, res, body){
       if(err || (body.status && body.status == "Error")) {reject(body); return;}
       self.items = body;
+      for (var key in body) {
+        if (body.hasOwnProperty(key)) {
+          //check item to be sure it's not in a disallowed group
+          if(!(body[key].group && self.badItemGroups.includes(body[key].group))) {
+            //check item to be sure it's not got a disallowed name.
+            if(!self.badItemNames.includes(body[key].name)) {
+              self.itemKeys.push(key);
+            }
+          }
+        }
+      }
       resolve("Item Data loaded successfully.");
     });
   });
@@ -133,6 +133,11 @@ APIData.prototype.loadSummonerSpells = function (region, version) {
     client.get(`/spells`, function(err, res, body){
       if(err || (body.status && body.status == "Error")) {reject(body); return;}
       self.summonerSpells = body;
+      for(var key in body) {
+        if(body.hasOwnProperty(key)) {
+          self.summonerSpellKeys.push(key);
+        }
+      }
       resolve("Summoner Spell Data loaded successfully.");
     });
   });
