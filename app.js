@@ -72,8 +72,6 @@ ipcMain.on('generateNewBuild', function() {
   console.log("Generating new build!");
   BuildGenerator.generate(11).then(function(result) { //TODO: Get map value from UI. Currently hard-coded to Rift.
     mainWindow.webContents.send("buildGenerated", result);
-  },function(error) {
-    console.log(error);
   });
 });
 

@@ -23,6 +23,7 @@
           <div class="items-info">
             <div class="build-name">SHITTY VI</div>
             <div class="items"></div>
+            <div class="skills"></div>
           </div>
           <div class="clearfix"></div>
         </div>
@@ -36,11 +37,8 @@
   <script src="js/tooltips.js"></script>
   <script src="js/load.js"></script>
   <script src="js/main.js"></script>
-  <script id="spell-template" type="text/x-handlebars-template">
-    <div class="spell" data-toggle="tooltip" title="{{title}}" style="background-image: url({{url}})"></div>
-  </script>
-  <script id="item-template" type="text/x-handlebars-template">
-    <div class="item" data-toggle="tooltip" title="{{title}}" style="background-image: url({{url}})"></div>
+  <script id="object-template" type="text/x-handlebars-template">
+    <div class="{{type}}" data-toggle="tooltip" title="{{title}}" style="background-image: url({{url}})"><div class="inner">{{inner}}</div></div>
   </script>
 </body>
 </html>

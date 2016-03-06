@@ -100,31 +100,40 @@ APIData.prototype.loadItems = function (region, version) {
       self.items = body;
       for (var key in body) {
         if (body.hasOwnProperty(key)) {
+          var goodItem = true;
+
           if(body[key].tags) {
             for (var i = 0; i < body[key].tags.length; i++) {
               var tag = body[key].tags[i];
               if(!self.itemsAsTags[tag]) {self.itemsAsTags[tag] = []};
               self.itemsAsTags[tag].push(body[key]);
+
+              //check item tags here, since we're already looping them.
+              if(self.badItemTags.includes(body[key].tags[i])) {
+                goodItem = false;
+              }
             }
           }
 
-          //check item to be sure it's not in a disallowed group
-          if(!(body[key].group && self.badItemGroups.includes(body[key].group))) {
-            //check item to be sure it's not got a disallowed name.
-            if(!self.badItemNames.includes(body[key].name)) {
-              //check item to be sure it doesn't have a disallowed tag.
-              if(body[key].tags) {
-                var bad = false;
-                for (var i = 0; i < body[key].tags.length; i++) {
-                  if(self.badItemTags.includes(body[key].tags[i])) {
-                    bad = true;
-                  }
-                }
-                if(!bad) {self.itemKeys.push(key);}
-              } else {
-                self.itemKeys.push(key);
-              }
-            }
+          var goodItem = true;
+
+          //check item group
+          if(body[key].group && self.badItemGroups.includes(body[key].group)) {
+            goodItem = false;
+          }
+
+          //check item name
+          if(self.badItemNames.includes(body[key].name)) {
+            goodItem = false;
+          }
+
+          //check for stupid consumable tag
+          if(body[key].consumed) {
+            goodItem = false;
+          }
+
+          if(goodItem) {
+            self.itemKeys.push(key);
           }
         }
       }
