@@ -34,6 +34,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   var items = message.items;
   var skills = message.skills;
   var masteries = message.masteries;
+  var goldTotal = 0;
   baseImageURL = message.versions.cdn + "/" + message.versions.v + "/img/";
   artImageURL = message.versions.cdn + "/img/champion/";
 
@@ -54,9 +55,12 @@ ipcRenderer.on('buildGenerated', function(event, message) {
 
   for (var i = 0; i < items.length; i++) {
     $('.items').append(createItemDiv(items[i]));
+    goldTotal = goldTotal + items[i].gold;
   }
 
   $('.items div').tooltip();
+
+  $('.gold').text("Total Gold: " + goldTotal);
 
   //SKILLS
   $('.skills').empty();
