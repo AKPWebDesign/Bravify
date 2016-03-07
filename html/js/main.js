@@ -1,6 +1,7 @@
 var baseImageURL = "";
 var artImageURL = "";
 var objectTemplate;
+var currentBuild;
 
 $(document).ready(function() {
   objectTemplate = Handlebars.compile($("#object-template").html());
@@ -11,13 +12,21 @@ $('button.go').click(function(){
   ipcRenderer.send('generateNewBuild');
 });
 
+$('button.copy').click(function() {
+  if(currentBuild) {
+    copyToClipboard(currentBuild);
+  }
+});
+
 ipcRenderer.on('buildGenerated', function(event, message) {
-  console.log(message);
+  currentBuild = message;
+
   //SETUP
   var champ = message.champ;
   var spells = message.spells;
   var items = message.items;
   var skills = message.skills;
+  var masteries = message.masteries;
   baseImageURL = message.versions.cdn + "/" + message.versions.v + "/img/";
   artImageURL = message.versions.cdn + "/img/champion/";
 
@@ -31,7 +40,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   $('.spells div').tooltip();
 
   //CHAMP NAME
-  $('.build-name').text('STUPID ' + champ.name.toUpperCase());
+  $('.build-name').text(message.adjective.toUpperCase() + " " + champ.name.toUpperCase());
 
   //ITEMS
   $('.items').empty();
@@ -51,10 +60,33 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   }
 
   $('.skills div').tooltip();
+
+  //MASTERIES
+  $('.masteries').empty();
+  $('.masteries').append(createMasteriesSpans(masteries));
 });
 
 function buildBackgroundImageURL(url) {
   return "url(" + url + ")";
+}
+
+function createMasteriesSpans(masteries) {
+  var trees = {
+    0: "ferocity",
+    1: "cunning",
+    2: "resolve"
+  };
+
+  var spanString = "";
+
+  for (var i = 0; i < masteries.length; i++) {
+    spanString += `<span class="mastery-${trees[i]}">${masteries[i]}</span>`
+    if(i !== masteries.length - 1) {
+      spanString += "/";
+    }
+  }
+
+  return spanString;
 }
 
 function createSpellDiv(spell) {
@@ -81,4 +113,24 @@ function createSkillDiv(skill, key) {
 
 function createObjectDiv(obj) {
   return objectTemplate(obj);
+}
+
+function copyToClipboard(build) {
+  var string = build.adjective.toUpperCase() + " " + build.champ.name.toUpperCase();
+  var skills = "";
+  for (var i = 0; i < build.skills.order.length; i++) {
+    skills += build.skills.order[i] + " > ";
+  }
+  skills = skills.slice(0, -3);
+  var masteries = "";
+  for (var i = 0; i < build.masteries.length; i++) {
+    masteries += build.masteries[i] + "/";
+  }
+  masteries = masteries.slice(0, -1);
+
+  string += ` (${build.spells[0].name} / ${build.spells[1].name} / ${skills}) (${masteries}) with `;
+
+
+
+  clipboard.writeText(string);
 }

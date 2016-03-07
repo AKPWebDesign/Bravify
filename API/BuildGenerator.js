@@ -20,8 +20,9 @@ BuildGenerator.prototype.generate = function (map) {
     var hasSmite = spells.includes(self.APIData.summonerSpells.SummonerSmite);
     var items = self.genItems(champ.name, map, hasSmite);
     var skills = self.genSkills(champ);
+    var adjective = self.genAdjective();
     //TODO: Pull mode to use from UI.
-    resolve({champ: champ, items: items, spells: spells, skills: skills, versions: self.APIData.versionData});
+    resolve({champ: champ, items: items, spells: spells, skills: skills, masteries: self.genMasteries(), adjective: adjective, versions: self.APIData.versionData});
   });
 };
 
@@ -32,6 +33,18 @@ BuildGenerator.prototype.genChamp = function () {
 BuildGenerator.prototype.genSpells = function (mode) {
   var set = chance.pickset(this.APIData.summonerSpellKeys[mode], 2);
   return set.map(s => this.APIData.summonerSpells[s]);
+};
+
+BuildGenerator.prototype.genAdjective = function () {
+  return "stupid";
+};
+
+BuildGenerator.prototype.genMasteries = function () {
+  var masteries = [18, 12, 0];
+
+  masteries = chance.shuffle(masteries);
+
+  return masteries;
 };
 
 BuildGenerator.prototype.genSkills = function (champ) {
@@ -92,6 +105,7 @@ BuildGenerator.prototype.genItems = function (champion, map, hasSmite) {
 BuildGenerator.prototype.newItem = function (map, badTags, base) {
   var done = false;
   var currentItem = base || null;
+  var lastItem = null;
   var items = this.APIData.itemKeys;
   var itemPath = [];
 
@@ -162,7 +176,9 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
 
   var item = this.APIData.items[currentItem];
 
+  //TODO: handle enchantments better.
   var obj = {
+    id: item.id,
     name: item.name,
     description: item.description,
     plaintext: item.plaintext,

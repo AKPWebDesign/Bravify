@@ -4,6 +4,7 @@ const ipcRenderer = require('electron').ipcRenderer;
 const remote = require('electron').remote;
 const imagesLoaded = require('imagesloaded');
 const Handlebars = require('handlebars');
+const clipboard = require('clipboard');
 
 //set up titlebar when document is ready.
 $(document).ready(function(){
