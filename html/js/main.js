@@ -18,6 +18,13 @@ $('button.copy').click(function() {
   }
 });
 
+$('button.save').click(function() {
+  if(currentBuild) {
+    console.log(currentBuild);
+    ipcRenderer.send('saveBuild', currentBuild);
+  }
+});
+
 ipcRenderer.on('buildGenerated', function(event, message) {
   currentBuild = message;
 
@@ -130,7 +137,11 @@ function copyToClipboard(build) {
 
   string += ` (${build.spells[0].name} / ${build.spells[1].name} / ${skills}) (${masteries}) with `;
 
+  for (var i = 0; i < build.items.length; i++) {
+    string += build.items[i].name + ", ";
+  }
 
+  string = string.slice(0, -2) + ".";
 
   clipboard.writeText(string);
 }

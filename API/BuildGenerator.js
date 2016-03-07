@@ -4,6 +4,8 @@ var chance = new (require("chance"))();
 function BuildGenerator(APIData) {
   this.APIData = APIData;
 
+  this.adjectives = require('./Adjectives');
+
   this.badItemTags = [
     "Boots",
     "Jungle",
@@ -18,7 +20,7 @@ BuildGenerator.prototype.generate = function (map) {
     var champ = self.genChamp();
     var spells = self.genSpells("CLASSIC");
     var hasSmite = spells.includes(self.APIData.summonerSpells.SummonerSmite);
-    var items = self.genItems(champ.name, map, hasSmite);
+    var items = self.genItems(champ.name, map, hasSmite, false); //TODO: Pull duplicatesAllowed value from UI.
     var skills = self.genSkills(champ);
     var adjective = self.genAdjective();
     //TODO: Pull mode to use from UI.
@@ -36,7 +38,7 @@ BuildGenerator.prototype.genSpells = function (mode) {
 };
 
 BuildGenerator.prototype.genAdjective = function () {
-  return "stupid";
+  return chance.pickone(this.adjectives);
 };
 
 BuildGenerator.prototype.genMasteries = function () {
@@ -68,8 +70,9 @@ BuildGenerator.prototype.genSkills = function (champ) {
   return skills;
 };
 
-BuildGenerator.prototype.genItems = function (champion, map, hasSmite) {
+BuildGenerator.prototype.genItems = function (champion, map, hasSmite, duplicatesAllowed) {
   var items = [];
+  var ids = [];
   var groups = [];
 
   //first item will be boots.
@@ -84,6 +87,19 @@ BuildGenerator.prototype.genItems = function (champion, map, hasSmite) {
     var good = false;
     while(!good) {
       var item = this.newItem(map, this.badItemTags);
+
+      //in case we get a null item
+      if(!item) {
+        continue;
+      }
+
+      //if we aren't allowed to have duplicate items and we already have this item, skip to next iteration of loop.
+      if(!duplicatesAllowed && ids.includes(item.id)) {
+        continue;
+      }
+
+      ids.push(item.id);
+
       //if we have a "required champion", we make sure that we generated the right champ for this item.
       if((item.requiredChampion && (item.requiredChampion == champion)) || !item.requiredChampion) {
         if(item.group) {
@@ -106,6 +122,7 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
   var done = false;
   var currentItem = base || null;
   var lastItem = null;
+  var twoItemsBack = null;
   var items = this.APIData.itemKeys;
   var itemPath = [];
 
@@ -125,6 +142,9 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
     }
 
     if(items) {
+      //weird queue system for use later in the function.
+      twoItemsBack = lastItem;
+      lastItem = currentItem;
       currentItem = chance.pickone(items);
     } else {
       //check map, make sure we can use this item on the map we selected.
@@ -176,10 +196,33 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
 
   var item = this.APIData.items[currentItem];
 
-  //TODO: handle enchantments better.
+  //console.log(itemPath);
+
+  if(!item.gold.purchasable) {
+    if(lastItem) {
+      item = this.APIData.items[lastItem];
+    } else {
+      //we need a lastItem here. if we don't have one, bad things happen on the UI side. emergency exit now.
+      return null;
+    }
+    if(twoItemsBack) {
+      lastItem = twoItemsBack;
+    }
+  }
+
+  var name = item.name;
+
+  if(name.startsWith("Enchantment:")) {
+    if(lastItem) {
+      var ind = name.indexOf(" ");
+      name = name.slice(ind);
+      name = this.APIData.items[lastItem].name + " - " + name;
+    }
+  }
+
   var obj = {
     id: item.id,
-    name: item.name,
+    name: name,
     description: item.description,
     plaintext: item.plaintext,
     gold: item.gold.total,
@@ -187,8 +230,6 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
     requiredChampion: item.requiredChampion,
     group: item.group
   }
-
-  //console.log(itemPath);
 
   return obj;
 };

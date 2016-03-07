@@ -1,0 +1,98 @@
+{
+    "map": "SR",
+    "blocks": [
+        {
+            "items": [
+                {
+                    "id": "3031",
+                    "count": 1
+                },
+                {
+                    "id": "3094",
+                    "count": 1
+                },
+                {
+                    "id": "3006",
+                    "count": 1
+                },
+                {
+                    "id": "3072",
+                    "count": 1
+                },
+                {
+                    "id": "3036",
+                    "count": 1
+                },
+                {
+                    "id": "3139",
+                    "count": 1
+                }
+            ],
+            "type": "Main Build"
+        },
+        {
+            "items": [
+                {
+                    "id": "2003",
+                    "count": 1
+                },
+                {
+                    "id": "2043",
+                    "count": 1
+                },
+                {
+                    "id": "2044",
+                    "count": 1
+                },
+                {
+                    "id": "2041",
+                    "count": 1
+                },
+                {
+                    "id": "2138",
+                    "count": 1
+                },
+                {
+                    "id": "2137",
+                    "count": 1
+                },
+                {
+                    "id": "2140",
+                    "count": 1
+                },
+                {
+                    "id": "2139",
+                    "count": 1
+                }
+            ],
+            "type": "Consumables"
+        },
+        {
+            "items": [
+                {
+                    "id": "3361",
+                    "count": 1
+                },
+                {
+                    "id": "3362",
+                    "count": 1
+                },
+                {
+                    "id": "3364",
+                    "count": 1
+                },
+                {
+                    "id": "3363",
+                    "count": 1
+                }
+            ],
+            "type": "Trinkets"
+        }
+    ],
+    "title": "",
+    "priority": true,
+    "mode": "any",
+    "type": "custom",
+    "sortrank": 99999,
+    "champion": ""
+}

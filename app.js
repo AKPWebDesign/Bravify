@@ -9,10 +9,13 @@ const ipcMain = require('electron').ipcMain; // ipc main reference.
 // Load data from Riot APIs when we start the application.
 const APIData = new (require("./API/APIData"))();
 const BuildGenerator = new (require("./API/BuildGenerator"))(APIData);
+const ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
+
+var build = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -69,11 +72,23 @@ app.on('ready', function() {
 
 // Called when the client requests a new build to be generated
 ipcMain.on('generateNewBuild', function() {
-  console.log("Generating new build!");
   BuildGenerator.generate(11).then(function(result) { //TODO: Get map value from UI. Currently hard-coded to Rift.
+    build = result;
     mainWindow.webContents.send("buildGenerated", result);
   });
 });
+
+ipcMain.on('saveBuild', function() {
+  if(build) {
+    var set = ItemSetGenerator.generate(build);
+    saveBuild(set);
+    mainWindow.webContents.send("itemSetSaved", set);
+  }
+});
+
+function saveBuild(itemSet) {
+  //TODO: Save item set to League folder.
+}
 
 // The methods below will be called upon receiving various messages from our
 // rendering thread. These are used to do things in the app when the user clicks
