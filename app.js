@@ -1,5 +1,8 @@
 'use strict';
 
+//make the errors pretty.
+require('pretty-error').start();
+
 const electron = require('electron');
 const dialog = require('electron').dialog;
 const app = electron.app;  // Module to control application life.
