@@ -55,7 +55,7 @@ BuildGenerator.prototype.genSkills = function (champ) {
   var skills = {};
 
   for (var i = 0; i < champ.spells.length; i++) {
-    if(champ.spells[i].maxrank > 3) {
+    if(champ.spells[i].maxrank == 5) {
       skills[skillToKey[i]] = {
         image: champ.spells[i].image.full,
         name: champ.spells[i].name,
