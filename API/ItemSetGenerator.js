@@ -18,7 +18,7 @@ ItemSetGenerator.prototype.generate = function (build) {
 
   //add items to first block.
   for (var i = 0; i < build.items.length; i++) {
-    itemSet.blocks[0].items.push({id: build.items[i].id, count: 1});
+    itemSet.blocks[0].items.push({id: build.items[i].id.toString(), count: 1});
   }
 
 

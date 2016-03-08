@@ -18,6 +18,7 @@
     "handlebars": "^4.0.5",
     "imagesloaded": "^4.1.0",
     "jquery": "^2.2.1",
+    "jsonfile": "^2.2.3",
     "pretty-error": "^2.0.0",
     "request-json": "^0.5.5",
     "titlebar": "^1.4.0"

@@ -1,13 +1,20 @@
 'use strict';
 
 //make the errors pretty.
-require('pretty-error').start();
+var PrettyError = require('pretty-error');
+var pe = new PrettyError();
+pe.start();
+pe.skipNodeFiles();
+pe.withoutColors();
 
 const electron = require('electron');
 const dialog = require('electron').dialog;
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const ipcMain = require('electron').ipcMain; // ipc main reference.
+const path = require('path'); // path tools
+const fs = require('fs'); // filesystem tools
+const jsonfile = require('jsonfile'); //tools for saving JSON to files.
 
 // Load data from Riot APIs when we start the application.
 const APIData = new (require("./API/APIData"))();
@@ -90,7 +97,52 @@ ipcMain.on('saveBuild', function() {
 });
 
 function saveBuild(itemSet) {
-  //TODO: Save item set to League folder.
+  if(!fs.existsSync(getLeaguePath())) {
+    fs.mkdirSync(getLeaguePath());
+  }
+  jsonfile.writeFile(path.join(getLeaguePath(), "BravifyItemSet.json"), itemSet, function(err) {
+    if(err)
+      console.error(err);
+  });
+}
+
+function getLeaguePath() {
+  var home = process.env.HOME || process.env.USERPROFILE;
+
+  if(process.platform == 'darwin') {
+    if(fs.existsSync('/Applications/League of Legends.app')) {
+      return '/Applications/League of Legends.app/Contents/LoL/Config/Global/Recommended/';
+    } else if (fs.existsSync(path.join(home, '/Applications/League of Legends.app'))) {
+      return path.join(home, '/Applications/League of Legends.app/Contents/LoL/Config/Global/Recommended/');
+    } else {
+      //ask user for location.
+    }
+  } else {
+    if(fs.existsSync("C:/Riot Games/League of Legends/lol.launcher.exe")) {
+      return "C:/Riot Games/League of Legends/Config/Global/Recommended/";
+    } else {
+      //ask user for location.
+    }
+  }
+}
+
+function savePreferences(prefs) {
+
+}
+
+function loadPreferences() {
+
+}
+
+function getPrefDir() {
+  var dir = "";
+  if(process.platform == "darwin") {
+    dir = path.join(process.env.HOME, 'Library/Application Support/Bravify');
+  } else {
+    dir = path.join(process.env.APPDATA, "Bravify");
+  }
+
+  return dir;
 }
 
 // The methods below will be called upon receiving various messages from our
