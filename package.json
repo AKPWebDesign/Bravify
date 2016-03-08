@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Austin Peterson <austin@akpwebdesign.com>",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "GPL-3.0",
   "devDependencies": {
     "asar": "^0.10.0",
     "electron-prebuilt": "^0.36.9"
