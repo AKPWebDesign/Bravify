@@ -13,6 +13,92 @@ html, body {
   height: 100%;
 }
 
+.app-container.champions {
+  background-image: url("../img/champ_bg.png");
+  background-color: transparent;
+  width: 557px;
+  height: 647px;
+  border-radius: 0;
+  -webkit-app-region: drag;
+  position: absolute;
+  border-radius: 0 0 10px 10px;
+}
+
+.champion-list-container::-webkit-scrollbar {
+  width: 8px;
+  padding-right: 15px;
+}
+
+.champion-list-container::-webkit-scrollbar-track {
+  padding-right: 15px;
+  margin-right: 10px;
+  /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
+}
+
+.champion-list-container::-webkit-scrollbar-thumb {
+  background-color: #213D46;
+  border: 1px solid black;
+  border-radius: 3px;
+  /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
+}
+
+.champion-list-container {
+  -webkit-app-region: no-drag !important;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 45px;
+  padding: 15px 0;
+  padding-left: 10px;
+  width: 527px;
+  height: 510px;
+  background-color: #0D1C24;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.champion-list-container .champ-item-container {
+  float: left;
+  margin: 0 0;
+  width: 100px;
+  padding-bottom: 10px;
+  overflow-x: visible;
+}
+
+.champion-list-container .champ-item-container .champ-image {
+  background-position: center center;
+  background-size: cover;
+  width: 64px;
+  height: 64px;
+  border-image-source: url("../img/champ_border.png");
+  border-image-slice: 2;
+  border-image-repeat: stretch;
+  margin-left: 18px;
+  background-repeat: no-repeat;
+}
+
+.champion-list-container .champ-item-container:hover .champ-image {
+  border-image-source: url("../img/champ_border_hover.png");
+  border-image-slice: 10;
+}
+
+.champion-list-container .champ-item-container.selected .champ-image {
+  border-image-source: url("../img/champ_border_selected.png");
+  border-image-slice: 5;
+}
+
+.champion-list-container .champ-item-container .champ-name {
+  color: #2e98a8;
+  text-align: center;
+  font-size: 13px;
+}
+
+.champions .buttons-container {
+  text-align: center;
+  margin: 20px auto;
+  width: 250px;
+  -webkit-app-region: no-drag;
+}
+
 .titlebar-container {
   box-sizing: content-box;
 }

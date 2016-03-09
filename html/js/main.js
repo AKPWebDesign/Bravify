@@ -25,6 +25,10 @@ $('button.save').click(function() {
   }
 });
 
+$('button.champs').click(function(){
+  ipcRenderer.send('openChampSelect');
+});
+
 ipcRenderer.on('buildGenerated', function(event, message) {
   currentBuild = message;
 

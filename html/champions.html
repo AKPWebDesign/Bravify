@@ -1,1 +1,21 @@
-<!-- TODO: this whole page. -->
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container champions">
+    <div class="champion-list-container"></div>
+    <div class="buttons-container">
+      <button class="save-champs btn btn-lg btn-primary">Save Selection</button>
+      <button class="close-window btn btn-sm btn-secondary">Close</button>
+    </div>
+  </div>
+  <script src="js/champs.js"></script>
+  <script src="js/tether.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
+  <script id="champ-template" type="text/x-handlebars-template">
+    <div class="champ-item-container" data-key="{{champKey}}"><div class="champ-image" title="{{title}}" style="background-image: url({{url}})"></div><div class="champ-name">{{name}}</div></div>
+  </script>
+</body>
+</html>

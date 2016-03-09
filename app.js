@@ -24,6 +24,7 @@ const ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
+var champSelectWindow = null;
 
 var build = null;
 
@@ -145,6 +146,33 @@ function getPrefDir() {
   return dir;
 }
 
+function openChampSelectWindow() {
+  if(!champSelectWindow) {
+    champSelectWindow = new BrowserWindow({
+      width: 557,
+      height: 647,
+      fullscreen: false,
+      center: true,
+      resizable: false,
+      show: false,
+      frame: false,
+      transparent: true,
+      title: 'Bravify Champ Select'});
+
+    champSelectWindow.loadURL('file://' + __dirname + '/html/champions.html');
+
+    champSelectWindow.webContents.on('did-finish-load', function(){
+      champSelectWindow.show();
+    });
+
+    champSelectWindow.on('closed', function(){
+      champSelectWindow = null;
+    });
+  } else {
+      champSelectWindow.close();
+  }
+}
+
 // The methods below will be called upon receiving various messages from our
 // rendering thread. These are used to do things in the app when the user clicks
 // on things in the interface.
@@ -158,4 +186,13 @@ ipcMain.on('minimize-main-window', function() {
 
 ipcMain.on('maximize-main-window', function() {
   (mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize());
+});
+
+ipcMain.on('openChampSelect', function() {
+  openChampSelectWindow();
+});
+
+ipcMain.on('retrieveChamps', function() {
+  if(!champSelectWindow) {return;}
+  champSelectWindow.webContents.send("champions", {champs: APIData.champs, versions: APIData.versionData});
 });
