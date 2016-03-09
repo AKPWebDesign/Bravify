@@ -196,3 +196,8 @@ ipcMain.on('retrieveChamps', function() {
   if(!champSelectWindow) {return;}
   champSelectWindow.webContents.send("champions", {champs: APIData.champs, versions: APIData.versionData});
 });
+
+ipcMain.on('closeChampsWindow', function() {
+  if(!champSelectWindow) {return;}
+  champSelectWindow.close();
+});

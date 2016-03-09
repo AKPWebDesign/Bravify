@@ -9,6 +9,14 @@ var champsByName = {};
 $(document).ready(function(){
   objectTemplate = Handlebars.compile($("#champ-template").html());
   ipcRenderer.send('retrieveChamps');
+
+  $('.close-window').click(function() {
+    ipcRenderer.send('closeChampsWindow');
+  });
+
+  $('.save-champs').click(function() {
+    saveAndClose();
+  });
 });
 
 ipcRenderer.on("champions", function(event, message) {
@@ -41,4 +49,8 @@ function createChampDiv(champ) {
   var url = baseImageURL + 'champion/' + champ.image.full;
   var context = {url: url, title: title, name: name, champKey: key};
   return objectTemplate(context);
+}
+
+function saveAndClose() {
+  
 }
