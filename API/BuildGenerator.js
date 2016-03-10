@@ -14,16 +14,17 @@ function BuildGenerator(APIData) {
   ]
 }
 
-BuildGenerator.prototype.generate = function (map) {
+BuildGenerator.prototype.generate = function (mapData) {
   var self = this;
+  var map = mapData.map;
+  var mode = mapData.mode;
   return new Promise(function(resolve, reject) {
     var champ = self.genChamp();
-    var spells = self.genSpells("CLASSIC");
+    var spells = self.genSpells(mode);
     var hasSmite = spells.includes(self.APIData.summonerSpells.SummonerSmite);
     var items = self.genItems(champ.name, map, hasSmite, false); //TODO: Pull duplicatesAllowed value from UI.
     var skills = self.genSkills(champ);
     var adjective = self.genAdjective();
-    //TODO: Pull mode to use from UI.
     resolve({champ: champ, items: items, spells: spells, skills: skills, masteries: self.genMasteries(), adjective: adjective, versions: self.APIData.versionData});
   });
 };
@@ -74,6 +75,8 @@ BuildGenerator.prototype.genItems = function (champion, map, hasSmite, duplicate
   var items = [];
   var ids = [];
   var groups = [];
+
+  //console.log(`Generating items for map: ${map}.`)
 
   //first item will be boots.
   items.push(this.newItem(map, null, "1001")); //generate item starting with basic boots.

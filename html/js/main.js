@@ -2,6 +2,7 @@ var baseImageURL = "";
 var artImageURL = "";
 var objectTemplate;
 var currentBuild;
+var mapData = {map: 11, mode: "CLASSIC"};
 
 $(document).ready(function() {
   objectTemplate = Handlebars.compile($("#object-template").html());
@@ -9,7 +10,7 @@ $(document).ready(function() {
 
 
 $('button.go').click(function(){
-  ipcRenderer.send('generateNewBuild');
+  ipcRenderer.send('generateNewBuild', mapData);
 });
 
 $('button.copy').click(function() {
@@ -25,8 +26,20 @@ $('button.save').click(function() {
   }
 });
 
-$('button.champs').click(function(){
+$('button.champs').click(function() {
   ipcRenderer.send('openChampSelect');
+});
+
+$('.buttons .maps .dropdown-item').click(function() {
+  var map = ($(this).data("map") || 11);
+  var mode = ($(this).data("mode") || "CLASSIC");
+  mapData = {map: map, mode: mode};
+  $('.buttons .maps .dropdown-toggle').text($(this).text());
+  $('button.go').click();
+});
+
+ipcRenderer.on('champsChanged', function() {
+  $('button.go').click();
 });
 
 ipcRenderer.on('buildGenerated', function(event, message) {
@@ -42,9 +55,15 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   baseImageURL = message.versions.cdn + "/" + message.versions.v + "/img/";
   artImageURL = message.versions.cdn + "/img/champion/";
 
+  //RANDOM SKIN FOR ART
+  var randomSkin = champ.skins[Math.floor(Math.random()*champ.skins.length)];
+  var nameText = randomSkin.name;
+  if(nameText == "default") {nameText = champ.name;}
+  $('.champ-skin-name').text(nameText);
+
   //CHAMP-RELATED IMAGES
   $('.champ-icon').css("background-image", buildBackgroundImageURL(baseImageURL + 'champion/' + champ.image.full));
-  $('.app-container').css("background-image", buildBackgroundImageURL(artImageURL + 'splash/' + champ.key + "_0.jpg"));
+  $('.app-container').css("background-image", buildBackgroundImageURL(`${artImageURL}splash/${champ.key}_${randomSkin.num}.jpg`));
 
   //SPELLS
   $('.spells div').tooltip('dispose');

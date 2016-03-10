@@ -32,14 +32,12 @@ html, body {
 .champion-list-container::-webkit-scrollbar-track {
   padding-right: 15px;
   margin-right: 10px;
-  /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
 }
 
 .champion-list-container::-webkit-scrollbar-thumb {
   background-color: #213D46;
   border: 1px solid black;
   border-radius: 3px;
-  /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
 }
 
 .champion-list-container {
@@ -97,6 +95,20 @@ html, body {
   margin: 20px auto;
   width: 250px;
   -webkit-app-region: no-drag;
+}
+
+.group-selector {
+  position: absolute;
+  top: 17px;
+  right: 45px;
+  -webkit-app-region: no-drag;
+}
+
+.group-selector .btn-tiny {
+  padding: .1rem .5rem;
+  font-size: .82rem;
+  line-height: 1.25;
+  border-radius: .2rem;
 }
 
 .titlebar-container {
@@ -227,6 +239,18 @@ html, body {
   background-color: rgba(10,10,10,0.8);
   border-radius: 15px;
   padding: 20px 0;
+}
+
+.champ-skin-name {
+  color: white;
+  text-align: right;
+  position: absolute;
+  font-size: 20px;
+  right: 20px;
+  bottom: 20px;
+  background-color: rgba(10,10,10,0.8);
+  border-radius: 5px;
+  padding: 10px;
 }
 
 .loading-frame {

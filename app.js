@@ -82,8 +82,8 @@ app.on('ready', function() {
 });
 
 // Called when the client requests a new build to be generated
-ipcMain.on('generateNewBuild', function() {
-  BuildGenerator.generate(11).then(function(result) { //TODO: Get map value from UI. Currently hard-coded to Rift.
+ipcMain.on('generateNewBuild', function(event, message) {
+  BuildGenerator.generate(message).then(function(result) {
     build = result;
     mainWindow.webContents.send("buildGenerated", result);
   });
@@ -194,7 +194,13 @@ ipcMain.on('openChampSelect', function() {
 
 ipcMain.on('retrieveChamps', function() {
   if(!champSelectWindow) {return;}
-  champSelectWindow.webContents.send("champions", {champs: APIData.champs, versions: APIData.versionData});
+  champSelectWindow.webContents.send("champions", {champs: APIData.champs, versions: APIData.versionData, groups: require('./API/groups.json'), selected: APIData.champKeys});
+});
+
+ipcMain.on('newChampSelection', function(event, champs) {
+  if(!champs) {return;}
+  APIData.champKeys = champs;
+  mainWindow.webContents.send("champsChanged");
 });
 
 ipcMain.on('closeChampsWindow', function() {

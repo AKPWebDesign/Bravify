@@ -5,6 +5,31 @@
 </head>
 <body>
   <div class="app-container champions">
+    <div class="group-selector">
+      <div class="btn-group">
+        <button type="button" class="group-select btn btn-tiny btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Select a group
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" data-group="All" href="#">All</a>
+          <a class="dropdown-item" data-group="None" href="#">None</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" data-group="Ascendant" href="#">Ascendants</a>
+          <a class="dropdown-item" data-group="Bilgewater" href="#">Bilgewater</a>
+          <a class="dropdown-item" data-group="Demacia" href="#">Demacia</a>
+          <a class="dropdown-item" data-group="Freljord" href="#">Freljord</a>
+          <a class="dropdown-item" data-group="Ionia" href="#">Ionia</a>
+          <a class="dropdown-item" data-group="MountTargon" href="#">Mount Targon</a>
+          <a class="dropdown-item" data-group="Noxus" href="#">Noxus</a>
+          <a class="dropdown-item" data-group="Piltover" href="#">Piltover</a>
+          <a class="dropdown-item" data-group="ShadowIsles" href="#">Shadow Isles</a>
+          <a class="dropdown-item" data-group="Shurima" href="#">Shurima</a>
+          <a class="dropdown-item" data-group="Voidborn" href="#">Voidborn</a>
+          <a class="dropdown-item" data-group="Yordle" href="#">Yordles</a>
+          <a class="dropdown-item" data-group="Zaun" href="#">Zaun</a>
+        </div>
+      </div>
+    </div>
     <div class="champion-list-container"></div>
     <div class="buttons-container">
       <button class="save-champs btn btn-lg btn-primary">Save Selection</button>
@@ -15,7 +40,7 @@
   <script src="js/tether.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
   <script id="champ-template" type="text/x-handlebars-template">
-    <div class="champ-item-container" data-key="{{champKey}}"><div class="champ-image" title="{{title}}" style="background-image: url({{url}})"></div><div class="champ-name">{{name}}</div></div>
+    <div class="champ-item-container {{selected}} {{champKey}}" data-key="{{champKey}}"><div class="champ-image" title="{{title}}" style="background-image: url({{url}})"></div><div class="champ-name">{{name}}</div></div>
   </script>
 </body>
 </html>

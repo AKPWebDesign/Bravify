@@ -1,0 +1,146 @@
+{
+  "Ascendant": [
+    "Nasus",
+    "Azir",
+    "Renekton",
+    "Xerath"
+  ],
+  "Yordle": [
+    "Corki",
+    "Gnar",
+    "Heimerdinger",
+    "Lulu",
+    "Kennen",
+    "Poppy",
+    "Rumble",
+    "Teemo",
+    "Tristana",
+    "Veigar",
+    "Ziggs"
+  ],
+  "Voidborn": [
+    "Chogath",
+    "Khazix",
+    "Kogmaw",
+    "Reksai",
+    "Velkoz"
+  ],
+  "Demacia": [
+    "Fiora",
+    "Galio",
+    "Garen",
+    "JarvanIV",
+    "Kayle",
+    "Lucian",
+    "Lux",
+    "Poppy",
+    "Quinn",
+    "Shyvana",
+    "Sona",
+    "Vayne",
+    "XinZhao"
+  ],
+  "Freljord": [
+    "Anivia",
+    "Ashe",
+    "Braum",
+    "Gragas",
+    "Lissandra",
+    "Nunu",
+    "Olaf",
+    "Sejuani",
+    "Trundle",
+    "Tryndamere",
+    "Udyr",
+    "Volibear"
+  ],
+  "Noxus": [
+    "Cassiopeia",
+    "Darius",
+    "DrMundo",
+    "Draven",
+    "Katarina",
+    "Leblanc",
+    "Morgana",
+    "Singed",
+    "Sion",
+    "Swain",
+    "Talon",
+    "Urgot",
+    "Vladimir",
+    "Warwick"
+  ],
+  "Piltover": [
+    "Caitlyn",
+    "Corki",
+    "Ezreal",
+    "Heimerdinger",
+    "Jayce",
+    "Orianna",
+    "Vi",
+    "Ziggs"
+  ],
+  "MountTargon": [
+    "Diana",
+    "Leona",
+    "Pantheon",
+    "Taric"
+  ],
+  "Zaun": [
+    "DrMundo",
+    "Ekko",
+    "Jinx",
+    "Singed",
+    "Twitch",
+    "Urgot",
+    "Viktor",
+    "Warwick",
+    "Zac"
+  ],
+  "ShadowIsles": [
+    "Elise",
+    "Evelynn",
+    "Hecarim",
+    "Kalista",
+    "Karthus",
+    "Maokai",
+    "Mordekaiser",
+    "Thresh",
+    "Yorick"
+  ],
+  "Shurima": [
+    "Azir",
+    "Nasus",
+    "Rammus",
+    "Reksai",
+    "Renekton",
+    "Sivir",
+    "Skarner",
+    "Xerath"
+  ],
+  "Ionia": [
+    "Ahri",
+    "Irelia",
+    "Jhin",
+    "Karma",
+    "LeeSin",
+    "MasterYi",
+    "Soraka",
+    "Varus",
+    "Akali",
+    "Kennen",
+    "Shen",
+    "Sona",
+    "Syndra",
+    "Yasuo",
+    "Zed"
+  ],
+  "Bilgewater": [
+    "Fizz",
+    "Gangplank",
+    "Graves",
+    "Illaoi",
+    "MissFortune",
+    "TwistedFate"
+  ]
+}

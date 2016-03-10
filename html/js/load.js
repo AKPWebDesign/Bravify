@@ -3,7 +3,7 @@ ipcRenderer.on('updateProgressBar', function(event, message) {
 });
 
 ipcRenderer.on('finishedLoading', function(event, message) {
-  ipcRenderer.send('generateNewBuild');
+  ipcRenderer.send('generateNewBuild', {map: 11, mode: "CLASSIC"}); //defaulting to Rift. User can change later.
   if(message == true) {
     setTimeout(function(){
       $('.loading-frame').fadeOut(1000);
