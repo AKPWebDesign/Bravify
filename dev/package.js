@@ -27,7 +27,6 @@ if(process.platform == "win32") {
       console.log(appPath);
       doDarwinBuild();
       doRcEdit(appPath);
-      zip(appPath);
     }
   });
 } else {
@@ -46,13 +45,14 @@ function doDarwinBuild() {
 }
 
 function zip(appPath) {
+  if(!Array.isArray(appPath)){appPath = [appPath];}
   try {
     for (var i = 0; i < appPath.length; i++) {
       var dest = path.resolve(appPath[i] + ".zip");
       var src = path.resolve(appPath[i]);
       var sevenZip = "7z";
       if(process.platform == "win32") { sevenZip = "C:/Program Files/7-Zip/7z.exe"; }
-      var current_process = spawn(sevenZip, ['a', '-tzip', dest, src], {cwd: './tmp'});
+      var current_process = spawn(sevenZip, ['a', '-tzip', dest, src]);
       var wasError = false;
 
       current_process.stdout.on('data', function(msg){
@@ -82,7 +82,7 @@ function doRcEdit(appPath) {
   for (var i = 0; i < appPath.length; i++) {
     var pathStr = path.join(appPath[i], "Bravify.exe");
     rcedit(pathStr, rcOpts, function(err){
-      if(err){console.log(err);} else {console.log("rcedit finished on " + pathStr);}
+      if(err){console.log(err);} else {console.log("rcedit finished on " + pathStr);zip(appPath[i]);}
     });
   }
 }
