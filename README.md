@@ -14,8 +14,8 @@ When you're ready to play, you can click the `Save build` button to save the cur
 
 ## Screenshot(s)
 
-![App and in-game view](https://i.imgur.com/bNgPCcS.jpg)
-![App and champ select screen](https://i.imgur.com/SvO1KJV.png)
+![App and in-game view](https://i.imgur.com/A05qWm5.jpg)
+![App and champ select screen](https://i.imgur.com/ryWIGUW.png)
 
 ## Contributing
 
