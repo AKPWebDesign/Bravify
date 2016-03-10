@@ -64,7 +64,7 @@ function zip(appPath) {
         wasError = true;
       });
     }
-  } catch() {} //TODO: actually do something here? idk... maybe not.
+  } catch(e) {} //TODO: actually do something here? idk... maybe not.
 }
 
 function doRcEdit(appPath) {
