@@ -1,19 +1,19 @@
 var request = require('request-json');
 var client = request.createClient("http://lol-static-data.akpwebdesign.com/");
 var Promise = require("bluebird");
+const jsonfile = require('jsonfile');
+const fs = require('fs');
+const path = require('path');
 
 function APIData() {
+  this.dataPath = "";
   this.versionData = {};
   this.champs = {};
   this.champKeys = [];
   this.items = {};
   this.itemKeys = [];
-  this.maps = {};
-  this.masteries = {}
   this.summonerSpells = {};
   this.summonerSpellKeys = {};
-
-  this.itemsAsTags = {};
 
   this.badItemGroups = [
     "BootsNormal",
@@ -50,13 +50,45 @@ APIData.prototype.loadAll = function (progressFunction) {
   var region = "na"; //TODO: Allow definition of region/language somewhere in UI.
   var self = this;
 
+  if(process.platform == "darwin") {
+    this.dataPath = path.join(process.env.HOME, 'Library/Application Support/Bravify');
+  } else {
+    this.dataPath = path.join(process.env.APPDATA, "Bravify");
+  }
+
+  //check version we have against Riot version.
+  return this.loadVersionData(region, version).then(function(result) {
+    self.versionData = result.data;
+    if(fs.existsSync(path.join(self.dataPath, "data.json"))) {
+      try {
+        var data = jsonfile.readFileSync(path.join(self.dataPath, "data.json"));
+        if(data.versions.v !== result.data.v) {
+          return self.loadFromServer(region, version, progressFunction);
+        } else {
+          return self.loadFromCache(data, progressFunction);
+        }
+      } catch(e) {
+        return self.loadFromServer(region, version, progressFunction);
+      }
+    } else {
+      return self.loadFromServer(region, version, progressFunction);
+    }
+  });
+};
+
+APIData.prototype.loadFromServer = function (region, version, progressFunction) {
+  var self = this;
   //Load all data using promises.
   return Promise.each([this.loadChamps(region, version), this.loadItems(region, version),
-               this.loadMaps(region, version), this.loadMasteries(region, version),
                this.loadSummonerSpells(region, version), this.loadVersionData(region, version)], function(result, index, length) {
                  progressFunction(index, length);
                })
   .then(function(result){
+    var data = {};
+    for (var i = 0; i < result.length; i++) {
+      data[result[i].key] = result[i].data;
+    }
+    self.saveToCache(data);
     progressFunction(1, 1);
   }, function(error){
     //if any data errors, we come here.
@@ -65,13 +97,46 @@ APIData.prototype.loadAll = function (progressFunction) {
   });
 };
 
+APIData.prototype.loadFromCache = function (data, progressFunction) {
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    //ezpz, just pull data from object.
+    self.champs = data.champs;
+    self.items = data.items;
+    self.summonerSpells = data.spells;
+    self.versionData = data.versions;
+    self.champKeys = data.champKeys;
+    self.itemKeys = data.itemKeys;
+    self.summonerSpellKeys = data.summonerSpellKeys;
+    resolve("All data loaded from cache.");
+  }).then(function(result){
+    progressFunction(1, 1);
+  }, function(error){
+    //if any data errors, we come here.
+    console.error(error);
+    throw "There was an error loading data!";
+  });
+};
+
+APIData.prototype.saveToCache = function (data) {
+  var dataPath = this.dataPath;
+  data.champKeys = this.champKeys;
+  data.itemKeys = this.itemKeys;
+  data.summonerSpellKeys = this.summonerSpellKeys;
+  try {
+    jsonfile.writeFileSync(path.join(dataPath, "data.json"), data);
+  } catch(e) {
+    console.error(e);
+  }
+};
+
 APIData.prototype.loadVersionData = function (region, version) {
   var self = this;
   return new Promise(function(resolve, reject) {
     client.get(`/versions`, function(err, res, body){
       if(err || (body.status && body.status == "Error")) {reject(body); return;}
       self.versionData = body;
-      resolve("Version Data loaded successfully.");
+      resolve({key: "versions", status: "success", data: body});
     });
   });
 };
@@ -87,7 +152,7 @@ APIData.prototype.loadChamps = function (region, version) {
           self.champKeys.push(key);
         }
       }
-      resolve("Champ Data loaded successfully.");
+      resolve({key: "champs", status: "success", data: body});
     });
   });
 };
@@ -105,8 +170,6 @@ APIData.prototype.loadItems = function (region, version) {
           if(body[key].tags) {
             for (var i = 0; i < body[key].tags.length; i++) {
               var tag = body[key].tags[i];
-              if(!self.itemsAsTags[tag]) {self.itemsAsTags[tag] = []};
-              self.itemsAsTags[tag].push(body[key]);
 
               //check item tags here, since we're already looping them.
               if(self.badItemTags.includes(body[key].tags[i])) {
@@ -137,29 +200,7 @@ APIData.prototype.loadItems = function (region, version) {
           }
         }
       }
-      resolve("Item Data loaded successfully.");
-    });
-  });
-};
-
-APIData.prototype.loadMaps = function (region, version) {
-  var self = this;
-  return new Promise(function(resolve, reject) {
-    client.get(`/maps`, function(err, res, body){
-      if(err || (body.status && body.status == "Error")) {reject(body); return;}
-      self.maps = body; //TODO: associate lanes with maps, eg: treeline = top/bottom/jung, rift = top/mid/bottom/jung.
-      resolve("Map Data loaded successfully.");
-    });
-  });
-};
-
-APIData.prototype.loadMasteries = function (region, version) {
-  var self = this;
-  return new Promise(function(resolve, reject) {
-    client.get(`/masteries`, function(err, res, body){
-      if(err || (body.status && body.status == "Error")) {reject(body); return;}
-      self.masteries = body;
-      resolve("Mastery Data loaded successfully.");
+      resolve({key: "items", status: "success", data: body});
     });
   });
 };
@@ -182,7 +223,7 @@ APIData.prototype.loadSummonerSpells = function (region, version) {
         }
       }
       //console.log(self.summonerSpellKeys);
-      resolve("Summoner Spell Data loaded successfully.");
+      resolve({key: "spells", status: "success", data: body});
     });
   });
 };
