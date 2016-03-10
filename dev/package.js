@@ -3,6 +3,7 @@ var path = require('path');
 var rcedit = require('rcedit');
 var moment = require('moment');
 var packager = require('electron-packager');
+var spawn = require('child_process').spawn
 var copyright = `Copyright ${moment().format('YYYY')} ${pkg.author}. All Rights Reserved.`;
 var opts = {
   "arch": "all",
@@ -19,15 +20,51 @@ var opts = {
   "version": "0.36.9"
 };
 
-packager(opts, function(err, appPath) {
-  if(err) {console.error(err);} else {console.log(appPath); doDarwinBuild(); doRcEdit(appPath)}
-});
+if(process.platform == "win32") {
+  packager(opts, function(err, appPath) {
+    if(err) {console.error(err);}
+    else {
+      console.log(appPath);
+      doDarwinBuild();
+      doRcEdit(appPath);
+      zip(appPath);
+    }
+  });
+} else {
+  doDarwinBuild();
+}
 
 function doDarwinBuild() {
   opts.platform = "darwin";
   packager(opts, function(err, appPath) {
-    if(err) {console.error(err);} else {console.log(appPath);}
+    if(err) {console.error(err);}
+    else {
+      console.log(appPath);
+      zip(appPath);
+    }
   });
+}
+
+function zip(appPath) {
+  try {
+    for (var i = 0; i < appPath.length; i++) {
+      var dest = path.resolve(appPath[i] + ".zip");
+      var src = path.resolve(appPath[i]);
+      var sevenZip = "7z";
+      if(process.platform == "win32") { sevenZip = "C:/Program Files/7-Zip/7z.exe"; }
+      var current_process = spawn(sevenZip, ['a', '-tzip', dest, src], {cwd: './tmp'});
+      var wasError = false;
+
+      current_process.stdout.on('data', function(msg){
+        console.log(msg.toString());
+      });
+
+      current_process.stderr.on('data', function(msg){
+        console.error(msg.toString());
+        wasError = true;
+      });
+    }
+  } catch() {} //TODO: actually do something here? idk... maybe not.
 }
 
 function doRcEdit(appPath) {
