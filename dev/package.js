@@ -11,7 +11,7 @@ var opts = {
   "app-copyright": copyright,
   "app-version": pkg.version,
   "asar": true,
-  //"icon": {}, //TODO
+  "icon": "./resources/icon",
   "ignore": ['^/release($|/)', '^/dev($|/)'],
   "name": "Bravify",
   "out": "./release",
@@ -39,8 +39,8 @@ function doRcEdit(appPath) {
       "LegalCopyright": copyright,
     },
     "file-version": pkg.version,
-    "product-version": pkg.version
-    //"icon": ""
+    "product-version": pkg.version,
+    "icon": "./resources/icon.ico"
   }
   for (var i = 0; i < appPath.length; i++) {
     var pathStr = path.join(appPath[i], "Bravify.exe");
