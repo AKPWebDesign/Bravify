@@ -15,6 +15,7 @@ const ipcMain = require('electron').ipcMain; // ipc main reference.
 const path = require('path'); // path tools
 const fs = require('fs'); // filesystem tools
 const jsonfile = require('jsonfile'); //tools for saving JSON to files.
+const mkdirp = require('mkdirp'); //recursive mkdir
 
 // Load data from Riot APIs when we start the application.
 const APIData = new (require("./API/APIData"))();
@@ -25,8 +26,6 @@ const ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
 var champSelectWindow = null;
-
-var build = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -84,54 +83,144 @@ app.on('ready', function() {
 // Called when the client requests a new build to be generated
 ipcMain.on('generateNewBuild', function(event, message) {
   BuildGenerator.generate(message).then(function(result) {
-    build = result;
     mainWindow.webContents.send("buildGenerated", result);
   });
 });
 
-ipcMain.on('saveBuild', function() {
-  if(build) {
-    var set = ItemSetGenerator.generate(build);
-    saveBuild(set);
+ipcMain.on('saveBuild', function(event, message) {
+  if(message.build) {
+    var set = ItemSetGenerator.generate(message.build);
+    saveBuild(set, message.usePrefs);
     mainWindow.webContents.send("itemSetSaved", set);
   }
 });
 
-function saveBuild(itemSet) {
-  if(!fs.existsSync(getLeaguePath())) {
-    fs.mkdirSync(getLeaguePath());
+function saveBuild(itemSet, usePrefs) {
+  var dir = getLeaguePath(usePrefs);
+  if(!dir) {return;}
+
+  if(!fs.existsSync(dir)) {
+    mkdirp.sync(dir);
   }
-  jsonfile.writeFile(path.join(getLeaguePath(), "BravifyItemSet.json"), itemSet, function(err) {
+  jsonfile.writeFile(path.join(dir, "BravifyItemSet.json"), itemSet, function(err) {
     if(err)
       console.error(err);
   });
 }
 
-function getLeaguePath() {
+function getLeaguePath(usePrefs) {
   var home = process.env.HOME || process.env.USERPROFILE;
 
+  if(usePrefs && loadPreferences().leaguePath) {
+    return loadPreferences().leaguePath;
+  }
+
   if(process.platform == 'darwin') {
-    if(fs.existsSync('/Applications/League of Legends.app')) {
+    if(usePrefs && fs.existsSync('/Applications/League of Legends.app')) {
       return '/Applications/League of Legends.app/Contents/LoL/Config/Global/Recommended/';
     } else if (fs.existsSync(path.join(home, '/Applications/League of Legends.app'))) {
       return path.join(home, '/Applications/League of Legends.app/Contents/LoL/Config/Global/Recommended/');
     } else {
-      //ask user for location.
+      var done = false;
+      while(!done) {
+        var dir = getDirectory();
+        //check if user cancelled dialog.
+        if(!dir) {return null;} else {dir = dir[0];}
+
+        if(!dir.endsWith("League of Legends.app")) {
+          if(fs.existsSync(path.join(dir, "League of Legends.app"))) {
+            dir = path.join(dir, "League of Legends.app", "Config/Global/Recommended");
+          } else {
+            var response = dialog.showMessageBox({
+              type: "question",
+              buttons:["Yes", "No"],
+              defaultId: 1,
+              title: "Are you sure this is the League of Legends directory?",
+              message: "Click yes if you're absolutely sure this is where League of Legends is located."
+            });
+
+            //confusing, but 0 is Yes.
+            if(!response) {
+              dir = path.join(dir, "Config/Global/Recommended");
+            } else {
+              dir = null;
+            }
+          }
+        } else {
+          dir = path.join(dir, "Config/Global/Recommended");
+        }
+
+        //if we have a directory, end the loop.
+        if(dir) {done = true;}
+      }
+
+      var prefs = loadPreferences();
+      prefs.leaguePath = dir;
+      savePreferences(prefs);
+      return prefs.leaguePath;
     }
   } else {
-    if(fs.existsSync("C:/Riot Games/League of Legends/lol.launcher.exe")) {
+    if(usePrefs && fs.existsSync("C:/Riot Games/League of Legends/lol.launcher.exe")) {
       return "C:/Riot Games/League of Legends/Config/Global/Recommended/";
     } else {
-      //ask user for location.
+      var done = false;
+      while(!done) {
+        var dir = getDirectory();
+        //check if user cancelled dialog.
+        if(!dir) {return null;} else {dir = dir[0];}
+
+        if(fs.existsSync(path.join(dir, "lol.launcher.exe"))) {
+          dir = path.join(dir, "Config/Global/Recommended/")
+        } else {
+          var response = dialog.showMessageBox({
+            type: "question",
+            buttons:["Yes", "No"],
+            defaultId: 1,
+            title: "Are you sure this is the League of Legends directory?",
+            message: "Click yes if you're absolutely sure this is where League of Legends is located."
+          });
+
+          //confusing, but 0 is Yes.
+          if(!response) {
+            dir = path.join(dir, "Config/Global/Recommended");
+          } else {
+            dir = null;
+          }
+        }
+
+        if(dir) {done = true;}
+      }
+
+      var prefs = loadPreferences();
+      prefs.leaguePath = dir;
+      savePreferences(prefs);
+      return prefs.leaguePath;
     }
   }
 }
 
-function savePreferences(prefs) {
+function getDirectory() {
+  var titleString = "Find League of Legends directory";
+  if(process.platform == 'darwin') {titleString = "Find League of Legends.app";}
+  return dialog.showOpenDialog({title: titleString, properties: ['openFile', 'openDirectory']});
+}
 
+function savePreferences(prefs) {
+  if(!prefs) {prefs = {};}
+  jsonfile.writeFile(path.join(getPrefDir(), "prefs.json"), prefs, function(err) {
+    if(err)
+      console.error(err);
+  });
 }
 
 function loadPreferences() {
+  //if no prefs file, return empty object.
+  if(!fs.existsSync(path.join(getPrefDir(), "prefs.json"))){ return {}; }
+  try {
+    return jsonfile.readFileSync(path.join(getPrefDir(), "prefs.json"));
+  } catch(e) {
+    return {};
+  }
 
 }
 

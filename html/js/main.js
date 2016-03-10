@@ -19,10 +19,15 @@ $('button.copy').click(function() {
   }
 });
 
-$('button.save').click(function() {
+$('button.save').mousedown(function(event) {
   if(currentBuild) {
-    console.log(currentBuild);
-    ipcRenderer.send('saveBuild', currentBuild);
+    switch (event.which) {
+        case 3:
+            ipcRenderer.send('saveBuild', {build: currentBuild, usePrefs: false});
+            break;
+        default:
+            ipcRenderer.send('saveBuild', {build: currentBuild, usePrefs: true});
+    }
   }
 });
 
