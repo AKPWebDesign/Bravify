@@ -33,7 +33,7 @@ if(process.platform == "win32") {
       doRcEdit(appPath);
       setTimeout(function() {
         zip(appPath);
-      }, 1500);
+      }, 2500);
     }
   });
 } else {
