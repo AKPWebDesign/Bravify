@@ -19,7 +19,7 @@ const mkdirp = require('mkdirp'); //recursive mkdir
 const homedir = require('homedir'); //home directory finder
 
 // Load data from Riot APIs when we start the application.
-const APIData = new (require('./API/APIData'))();
+const APIData = new (require('./API/APIData'))(getPrefDir());
 const BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
 const ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
 

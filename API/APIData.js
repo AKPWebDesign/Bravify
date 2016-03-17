@@ -9,8 +9,8 @@ const path = require('path');
 // TODO: What happens if the server goes down?
 // If we already have local data, we should use that. If not, we should tell the
 // user that the server is down, and to try again later.
-function APIData() {
-  this.dataPath = '';
+function APIData(dataPath) {
+  this.dataPath = dataPath;
   this.versionData = {};
   this.champs = {};
   this.champKeys = [];
@@ -53,18 +53,6 @@ APIData.prototype.loadAll = function (progressFunction) {
   var version = 'v1.2'; //TODO: Grab latest version from Riot API rather than using hardcoded string.
   var region = 'na'; //TODO: Allow definition of region/language somewhere in UI.
   var self = this;
-
-  switch(process.platform) {
-    case 'darwin':
-      this.dataPath = path.join(process.env.HOME, 'Library/Application Support/Bravify');
-      break;
-    case 'win32':
-      this.dataPath = path.join(process.env.APPDATA, 'Bravify');
-      break;
-    default:
-      this.dataPath = path.join('~', '.bravify');
-      break;
-  }
 
   //if the dataPath doesn't actually exist, create it now.
   if(!fs.existsSync(path.resolve(self.dataPath))) {
