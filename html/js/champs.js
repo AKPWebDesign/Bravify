@@ -1,15 +1,14 @@
 window.$ = window.jQuery = require('jquery');
 const ipcRenderer = require('electron').ipcRenderer;
-const remote = require('electron').remote;
 const Handlebars = require('handlebars');
 var objectTemplate;
-var baseImageURL = "";
+var baseImageURL = '';
 var champsByName = {};
 var groupData = {};
 var selectedChamps = [];
 
 $(document).ready(function(){
-  objectTemplate = Handlebars.compile($("#champ-template").html());
+  objectTemplate = Handlebars.compile($('#champ-template').html());
   ipcRenderer.send('retrieveChamps');
 
   $('.close-window').click(function() {
@@ -21,23 +20,23 @@ $(document).ready(function(){
   });
 
   $('.group-selector .dropdown-item').click(function() {
-    selectGroup($(this).data("group"));
+    selectGroup($(this).data('group'));
   });
 });
 
-ipcRenderer.on("champions", function(event, message) {
-  console.log(message);
+ipcRenderer.on('champions', function(event, message) {
+  var key;
   groupData = message.groups;
   selectedChamps = message.selected;
   $('.champion-list-container').empty();
-  baseImageURL = message.versions.cdn + "/" + message.versions.v + "/img/";
-  for (var key in message.champs) {
+  baseImageURL = message.versions.cdn + '/' + message.versions.v + '/img/';
+  for (key in message.champs) {
     if (message.champs.hasOwnProperty(key)) {
       champsByName[message.champs[key].name] = message.champs[key];
     }
   }
   console.log(champsByName);
-  for (var key in champsByName) {
+  for (key in champsByName) {
     if (champsByName.hasOwnProperty(key)) {
       $('.champion-list-container').append(createChampDiv(champsByName[key]));
     }
@@ -51,10 +50,10 @@ ipcRenderer.on("champions", function(event, message) {
 });
 
 function createChampDiv(champ) {
-  var title = champ.name + ", " + champ.title;
+  var title = champ.name + ', ' + champ.title;
   var name = champ.name;
   var key = champ.key;
-  var selected = (selectedChamps.includes(key) ? "selected" : "");
+  var selected = (selectedChamps.includes(key) ? 'selected' : '');
   var url = baseImageURL + 'champion/' + champ.image.full;
   var context = {url: url, title: title, name: name, champKey: key, selected: selected};
   return objectTemplate(context);
@@ -62,14 +61,14 @@ function createChampDiv(champ) {
 
 function saveAndClose() {
   //if no champs in selected, select all.
-  if(!$(".selected").length) {
+  if(!$('.selected').length) {
     selectAll();
   }
 
   selectedChamps = [];
 
   $('.selected').each(function(){
-    selectedChamps.push($(this).data("key"));
+    selectedChamps.push($(this).data('key'));
   });
 
   ipcRenderer.send('newChampSelection', selectedChamps);
@@ -77,23 +76,23 @@ function saveAndClose() {
 }
 
 function selectGroup(group) {
-  if(!group) {console.log("No group to select!"); return;}
+  if(!group) {console.log('No group to select!'); return;}
   switch(group) {
-    case "All":
+    case 'All':
       selectAll();
       return;
-    case "None":
+    case 'None':
       selectNone();
       return;
   }
 
   var champs = groupData[group];
   if(!champs) {
-    console.log("No champs in group "+group);
+    console.log('No champs in group '+group);
     return;
   }
 
-  if(!$(".champ-item-container:not(.selected)").length) {
+  if(!$('.champ-item-container:not(.selected)').length) {
     selectNone();
   }
 

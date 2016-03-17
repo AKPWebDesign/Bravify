@@ -1,16 +1,16 @@
 var request = require('request-json');
-var client = request.createClient("http://lol-static-data.akpwebdesign.com/");
-client.headers["User-Agent"] = "AKPWebDesign/Bravify <https://github.com/AKPWebDesign/Bravify>";
-var Promise = require("bluebird");
+var client = request.createClient('http://lol-static-data.akpwebdesign.com/');
+client.headers['User-Agent'] = 'AKPWebDesign/Bravify <https://github.com/AKPWebDesign/Bravify>';
+var Promise = require('bluebird'); // jshint ignore:line
 const jsonfile = require('jsonfile');
 const fs = require('fs');
 const path = require('path');
 
-//TODO: What happens if the server goes down?
+// TODO: What happens if the server goes down?
 // If we already have local data, we should use that. If not, we should tell the
 // user that the server is down, and to try again later.
 function APIData() {
-  this.dataPath = "";
+  this.dataPath = '';
   this.versionData = {};
   this.champs = {};
   this.champKeys = [];
@@ -20,52 +20,63 @@ function APIData() {
   this.summonerSpellKeys = {};
 
   this.badItemGroups = [
-    "BootsNormal",
-    "DoransItems",
-    "BootsFuror",
-    "BootsAlacrity",
-    "BootsCaptain",
-    "BootsDistortion",
-    "HealthPotion",
-    "FlaskGroup",
-    "PinkWards",
-    "RelicBase",
-    "Flasks",
-    "TheBlackSpear",
-    "GangplankRUpgrade01",
-    "GangplankRUpgrade02",
-    "GangplankRUpgrade03"
+    'BootsNormal',
+    'DoransItems',
+    'BootsFuror',
+    'BootsAlacrity',
+    'BootsCaptain',
+    'BootsDistortion',
+    'HealthPotion',
+    'FlaskGroup',
+    'PinkWards',
+    'RelicBase',
+    'Flasks',
+    'TheBlackSpear',
+    'GangplankRUpgrade01',
+    'GangplankRUpgrade02',
+    'GangplankRUpgrade03'
   ];
 
   this.badItemNames = [
-    "Cull"
+    'Cull'
   ];
 
   this.badItemTags = [
-    "Boots",
-    "Jungle",
-    "Trinket",
-    "Consumable"
+    'Boots',
+    'Jungle',
+    'Trinket',
+    'Consumable'
   ];
 }
 
 APIData.prototype.loadAll = function (progressFunction) {
-  var version = "v1.2"; //TODO: Grab latest version from Riot API rather than using hardcoded string.
-  var region = "na"; //TODO: Allow definition of region/language somewhere in UI.
+  var version = 'v1.2'; //TODO: Grab latest version from Riot API rather than using hardcoded string.
+  var region = 'na'; //TODO: Allow definition of region/language somewhere in UI.
   var self = this;
 
-  if(process.platform == "darwin") {
-    this.dataPath = path.join(process.env.HOME, 'Library/Application Support/Bravify');
-  } else {
-    this.dataPath = path.join(process.env.APPDATA, "Bravify");
+  switch(process.platform) {
+    case 'darwin':
+      this.dataPath = path.join(process.env.HOME, 'Library/Application Support/Bravify');
+      break;
+    case 'win32':
+      this.dataPath = path.join(process.env.APPDATA, 'Bravify');
+      break;
+    default:
+      this.dataPath = path.join('~', '.bravify');
+      break;
+  }
+
+  //if the dataPath doesn't actually exist, create it now.
+  if(!fs.existsSync(path.resolve(self.dataPath))) {
+    require('mkdirp').sync(self.dataPath);
   }
 
   //check version we have against Riot version.
   return this.loadVersionData(region, version).then(function(result) {
     self.versionData = result.data;
-    if(fs.existsSync(path.join(self.dataPath, "data.json"))) {
+    if(fs.existsSync(path.join(self.dataPath, 'data.json'))) {
       try {
-        var data = jsonfile.readFileSync(path.join(self.dataPath, "data.json"));
+        var data = jsonfile.readFileSync(path.join(self.dataPath, 'data.json'));
         if(data.versions.v !== result.data.v) {
           return self.loadFromServer(region, version, progressFunction);
         } else {
@@ -97,13 +108,13 @@ APIData.prototype.loadFromServer = function (region, version, progressFunction) 
   }, function(error){
     //if any data errors, we come here.
     console.error(error);
-    throw "There was an error loading data!";
+    throw 'There was an error loading data!';
   });
 };
 
 APIData.prototype.loadFromCache = function (data, progressFunction) {
   var self = this;
-  return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve) {
     //ezpz, just pull data from object.
     self.champs = data.champs;
     self.items = data.items;
@@ -112,13 +123,13 @@ APIData.prototype.loadFromCache = function (data, progressFunction) {
     self.champKeys = data.champKeys;
     self.itemKeys = data.itemKeys;
     self.summonerSpellKeys = data.summonerSpellKeys;
-    resolve("All data loaded from cache.");
-  }).then(function(result){
+    resolve('All data loaded from cache.');
+  }).then(function(){
     progressFunction(1, 1);
   }, function(error){
     //if any data errors, we come here.
     console.error(error);
-    throw "There was an error loading data!";
+    throw 'There was an error loading data!';
   });
 };
 
@@ -128,44 +139,44 @@ APIData.prototype.saveToCache = function (data) {
   data.itemKeys = this.itemKeys;
   data.summonerSpellKeys = this.summonerSpellKeys;
   try {
-    jsonfile.writeFileSync(path.join(dataPath, "data.json"), data);
+    jsonfile.writeFileSync(path.join(dataPath, 'data.json'), data);
   } catch(e) {
     console.error(e);
   }
 };
 
-APIData.prototype.loadVersionData = function (region, version) {
+APIData.prototype.loadVersionData = function () {
   var self = this;
   return new Promise(function(resolve, reject) {
     client.get(`/versions`, function(err, res, body){
-      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      if(err || (body.status && body.status === 'Error')) {reject(body); return;}
       self.versionData = body;
-      resolve({key: "versions", status: "success", data: body});
+      resolve({key: 'versions', status: 'success', data: body});
     });
   });
 };
 
-APIData.prototype.loadChamps = function (region, version) {
+APIData.prototype.loadChamps = function () {
   var self = this;
   return new Promise(function(resolve, reject) {
     client.get(`/champs`, function(err, res, body){
-      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      if(err || (body.status && body.status === 'Error')) {reject(body); return;}
       self.champs = body;
       for (var key in body) {
         if (body.hasOwnProperty(key)) {
           self.champKeys.push(key);
         }
       }
-      resolve({key: "champs", status: "success", data: body});
+      resolve({key: 'champs', status: 'success', data: body});
     });
   });
 };
 
-APIData.prototype.loadItems = function (region, version) {
+APIData.prototype.loadItems = function () {
   var self = this;
   return new Promise(function(resolve, reject) {
     client.get(`/items`, function(err, res, body){
-      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      if(err || (body.status && body.status === 'Error')) {reject(body); return;}
       self.items = body;
       for (var key in body) {
         if (body.hasOwnProperty(key)) {
@@ -173,16 +184,12 @@ APIData.prototype.loadItems = function (region, version) {
 
           if(body[key].tags) {
             for (var i = 0; i < body[key].tags.length; i++) {
-              var tag = body[key].tags[i];
-
               //check item tags here, since we're already looping them.
               if(self.badItemTags.includes(body[key].tags[i])) {
                 goodItem = false;
               }
             }
           }
-
-          var goodItem = true;
 
           //check item group
           if(body[key].group && self.badItemGroups.includes(body[key].group)) {
@@ -204,16 +211,16 @@ APIData.prototype.loadItems = function (region, version) {
           }
         }
       }
-      resolve({key: "items", status: "success", data: body});
+      resolve({key: 'items', status: 'success', data: body});
     });
   });
 };
 
-APIData.prototype.loadSummonerSpells = function (region, version) {
+APIData.prototype.loadSummonerSpells = function () {
   var self = this;
   return new Promise(function(resolve, reject) {
     client.get(`/spells`, function(err, res, body){
-      if(err || (body.status && body.status == "Error")) {reject(body); return;}
+      if(err || (body.status && body.status === 'Error')) {reject(body); return;}
       self.summonerSpells = body;
       for(var key in body) {
         if(body.hasOwnProperty(key)) {
@@ -227,7 +234,7 @@ APIData.prototype.loadSummonerSpells = function (region, version) {
         }
       }
       //console.log(self.summonerSpellKeys);
-      resolve({key: "spells", status: "success", data: body});
+      resolve({key: 'spells', status: 'success', data: body});
     });
   });
 };

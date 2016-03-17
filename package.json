@@ -19,6 +19,7 @@
     "bluebird": "^3.3.3",
     "chance": "^1.0.1",
     "handlebars": "^4.0.5",
+    "homedir": "^0.6.0",
     "imagesloaded": "^4.1.0",
     "jquery": "^2.2.1",
     "jsonfile": "^2.2.3",
