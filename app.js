@@ -243,8 +243,6 @@ function getPrefDir() {
       break;
   }
 
-  console.log(dir);
-
   return dir;
 }
 
