@@ -19,11 +19,14 @@ BuildGenerator.prototype.generate = function (mapData) {
   var map = mapData.map;
   var mode = mapData.mode;
   return new Promise(function(resolve) {
-    var champ = self.genChamp();
+    var skills, champ;
+    while(!skills) {
+      champ = self.genChamp();
+      skills = self.genSkills(champ);
+    }
     var spells = self.genSpells(mode);
     var hasSmite = spells.includes(self.APIData.summonerSpells.SummonerSmite);
     var items = self.genItems(champ.name, map, hasSmite, false); //TODO: Pull duplicatesAllowed value from UI.
-    var skills = self.genSkills(champ);
     var adjective = self.genAdjective();
     resolve({champ: champ, items: items, spells: spells, skills: skills, masteries: self.genMasteries(), adjective: adjective, versions: self.APIData.versionData});
   });
@@ -64,6 +67,10 @@ BuildGenerator.prototype.genSkills = function (champ) {
       };
       choices.push(skillToKey[i]);
     }
+  }
+
+  if(!choices) {
+    return null;
   }
 
   skills.order = chance.pickset(choices, 4);
