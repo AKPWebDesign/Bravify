@@ -95,7 +95,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
 
   for (var i = 0; i < skills.order.length; i++) {
     $('.skills').append(createSkillDiv(skills[skills.order[i]], skills.order[i]));
-    $('.skills').append('<div class='skill-spacer'>&gt;</div>')
+    $('.skills').append(`<div class='skill-spacer'>&gt;</div>`);
   }
 
   $('.skills div').tooltip();
@@ -119,7 +119,7 @@ function createMasteriesSpans(masteries) {
   var spanString = '';
 
   for (var i = 0; i < masteries.length; i++) {
-    spanString += `<span class='mastery-${trees[i]}'>${masteries[i]}</span>`
+    spanString += `<span class='mastery-${trees[i]}'>${masteries[i]}</span>`;
     if(i !== masteries.length - 1) {
       spanString += '/';
     }
