@@ -24,6 +24,7 @@
     "jquery": "^2.2.1",
     "jsonfile": "^2.2.3",
     "mkdirp": "^0.5.1",
+    "open": "0.0.5",
     "pretty-error": "^2.0.0",
     "request-json": "^0.5.5",
     "titlebar": "^1.4.0"

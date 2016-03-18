@@ -338,3 +338,10 @@ ipcMain.on('closeChampsWindow', function() {
 ipcMain.on('reloadData', function() {
   loadData();
 });
+
+ipcMain.on('openURL', function(event, message) {
+  var open = require('open');
+  if(message) {
+    open(message);
+  }
+});

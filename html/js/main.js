@@ -70,8 +70,14 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   //RANDOM SKIN FOR ART
   var randomSkin = champ.skins[Math.floor(Math.random()*champ.skins.length)];
   var nameText = randomSkin.name;
-  if(nameText == 'default') {nameText = champ.name;}
+  if(nameText === 'default') {nameText = champ.name;}
   $('.champ-skin-name').text(nameText);
+
+  $('.champ-skin-name').off();
+
+  $('.champ-skin-name').click(function(){
+    ipcRenderer.send('openURL', `${artImageURL}splash/${champ.key}_${randomSkin.num}.jpg`);
+  });
 
   //CHAMP-RELATED IMAGES
   $('.champ-icon').css('background-image', buildBackgroundImageURL(baseImageURL + 'champion/' + champ.image.full));
