@@ -95,13 +95,32 @@ ipcMain.on('generateNewBuild', function(event, message) {
 ipcMain.on('saveBuild', function(event, message) {
   if(message.build) {
     var set = ItemSetGenerator.generate(message.build);
-    saveBuild(set, message.usePrefs);
+    saveBuild(set);
     mainWindow.webContents.send('itemSetSaved', set);
   }
 });
 
-function saveBuild(itemSet, usePrefs) {
-  var dir = getLeaguePath(usePrefs);
+ipcMain.on('deleteBuild', function() {
+  deleteBuild();
+});
+
+ipcMain.on('changeLeaguePath', function() {
+  getLeaguePath(false);
+});
+
+function deleteBuild() {
+  var dir = getLeaguePath(true);
+  if(!dir) {return;}
+
+  if(!fs.existsSync(dir)) {
+    return;
+  }
+
+  fs.unlinkSync(path.join(dir, 'BravifyItemSet.json'));
+}
+
+function saveBuild(itemSet) {
+  var dir = getLeaguePath(true);
   if(!dir) {return;}
 
   if(!fs.existsSync(dir)) {

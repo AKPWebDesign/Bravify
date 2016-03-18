@@ -19,16 +19,18 @@ $('button.copy').click(function() {
   }
 });
 
-$('button.save').mousedown(function(event) {
+$('.save-group button.saveBuild').click(function() {
   if(currentBuild) {
-    switch (event.which) {
-        case 3:
-            ipcRenderer.send('saveBuild', {build: currentBuild, usePrefs: false});
-            break;
-        default:
-            ipcRenderer.send('saveBuild', {build: currentBuild, usePrefs: true});
-    }
+    ipcRenderer.send('saveBuild', {build: currentBuild});
   }
+});
+
+$('.save-group button.changeLeaguePath').click(function(){
+  ipcRenderer.send('changeLeaguePath');
+});
+
+$('.save-group button.deleteBuild').click(function(){
+  ipcRenderer.send('deleteBuild');
 });
 
 $('button.champs').click(function() {

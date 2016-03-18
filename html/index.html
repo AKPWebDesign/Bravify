@@ -45,7 +45,16 @@
             </div>
           </div>
           <button class="champs btn btn-danger">Choose Champions</button>
-          <button class="save btn btn-success">Save build</button>
+          <div class="btn-group save-group">
+            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Build Options
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item saveBuild">Save Build</button>
+              <button class="dropdown-item deleteBuild">Delete Build</button>
+              <button class="dropdown-item changeLeaguePath">Change League Path</button>
+            </div>
+          </div>
           <button class="copy btn btn-info">Copy to clipboard</button>
         </div>
       </div>
