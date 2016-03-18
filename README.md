@@ -8,13 +8,13 @@ See the [Releases](https://github.com/AKPWebDesign/Bravify/releases) page.
 
 ## Usage
 
-In order to use Bravify, you'll need to download it from the [Releases](https://github.com/AKPWebDesign/Bravify/releases) page. If you're on Windows, you'll download one of the `Bravify-win32` files, (the `Bravify-win32-ia32.zip` file should be the safe guess, if you don't already know which to pick). If you're on a Mac, you'll grab the `Bravify-darwin-x64.zip` file.
+In order to use Bravify, you'll need to download it from the [Releases](https://github.com/AKPWebDesign/Bravify/releases) page. If you're on Windows, you'll download one of the `Bravify-win32` files, (the `Bravify-win32-ia32.zip` file should be the safe guess, if you don't already know which to pick). If you're on a Mac, you'll grab the `Bravify-darwin-x64.zip` file, and if you're on Linux, you'll grab one of the `Bravify-linux` files.
 
-Next, you need to unzip the .zip file you downloaded, then you can open it up and look for `Bravify.exe` (not `Bravery.exe`), if you're on Windows, or `Bravify.app` if you're on Mac.
+Next, you need to unzip the .zip file you downloaded, then you can open it up and look for `Bravify.exe`, if you're on Windows, `Bravify` if you're on Linux, or `Bravify.app` if you're on Mac.
 
 It will then download the needed information from Riot's API, generate a build for you, and allow you to see the build. If you don't like the build, or don't own the champion it chose for you, you can click the `Generate` button to generate a new build. You can also choose a different map using the map choice dropdown button, and choose the champions to pick from using the `Choose Champions` button.  
 
-When you're ready to play, you can click the `Save build` button to save the current build as a custom [Item Set](https://support.riotgames.com/hc/en-us/articles/201752904-Item-Sets-), which will then be available to see in the in-game shop. You may be asked to choose where the League of Legends folder is when you hit `Save build`, if you installed League in a non-default location. Next, you simply need to start your game, ensuring to choose the champion, masteries, and summoner spells that Bravify generated, and you're on your way to the Ultimate Victory!
+When you're ready to play, you can click the `Build Options` button, then pick `Save Build` to save the current build as a custom [Item Set](https://support.riotgames.com/hc/en-us/articles/201752904-Item-Sets-), which will then be available to see in the in-game shop. You may be asked to choose where the League of Legends folder is when you hit `Save build`, if you installed League in a non-default location. Next, you simply need to start your game, ensuring to choose the champion, masteries, and summoner spells that Bravify generated, and you're on your way to the Ultimate Victory!
 
 ## Screenshot(s)
 
