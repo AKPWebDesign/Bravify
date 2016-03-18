@@ -11,6 +11,12 @@
       <h1>Loading...</h1>
       <progress class="progress progress-striped progress-info progress-animated" value="0" max="1"></progress>
     </div>
+    <div class="offline-frame centered">
+      <h1>We're offline! :(</h1>
+      <p>Bravify can't access the server it needs for data, and the data hasn't been cached.
+      Please try again later.</p>
+      <p><button class="btn btn-primary reload">Try again now</button></p>
+    </div>
     <div class="champ-frame">
       <div class='build-container centered'>
         <div class="build">
@@ -45,7 +51,16 @@
             </div>
           </div>
           <button class="champs btn btn-danger">Choose Champions</button>
-          <button class="save btn btn-success">Save build</button>
+          <div class="btn-group save-group">
+            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Build Options
+            </button>
+            <div class="dropdown-menu">
+              <button class="dropdown-item saveBuild">Save Build</button>
+              <button class="dropdown-item deleteBuild">Delete Build</button>
+              <button class="dropdown-item changeLeaguePath">Change League Path</button>
+            </div>
+          </div>
           <button class="copy btn btn-info">Copy to clipboard</button>
         </div>
       </div>

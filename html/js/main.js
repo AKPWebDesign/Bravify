@@ -1,15 +1,20 @@
-var baseImageURL = "";
-var artImageURL = "";
+var baseImageURL = '';
+var artImageURL = '';
 var objectTemplate;
 var currentBuild;
-var mapData = {map: 11, mode: "CLASSIC"};
+var mapData = {map: 11, mode: 'CLASSIC'};
 
 $(document).ready(function() {
-  objectTemplate = Handlebars.compile($("#object-template").html());
+  objectTemplate = Handlebars.compile($('#object-template').html());
 });
 
+$('button.reload').click(function() {
+  $('.offline-frame').fadeOut(250);
+  $('.loading-frame').fadeIn(250);
+  ipcRenderer.send('reloadData');
+});
 
-$('button.go').click(function(){
+$('button.go').click(function() {
   ipcRenderer.send('generateNewBuild', mapData);
 });
 
@@ -19,16 +24,18 @@ $('button.copy').click(function() {
   }
 });
 
-$('button.save').mousedown(function(event) {
+$('.save-group button.saveBuild').click(function() {
   if(currentBuild) {
-    switch (event.which) {
-        case 3:
-            ipcRenderer.send('saveBuild', {build: currentBuild, usePrefs: false});
-            break;
-        default:
-            ipcRenderer.send('saveBuild', {build: currentBuild, usePrefs: true});
-    }
+    ipcRenderer.send('saveBuild', {build: currentBuild});
   }
+});
+
+$('.save-group button.changeLeaguePath').click(function(){
+  ipcRenderer.send('changeLeaguePath');
+});
+
+$('.save-group button.deleteBuild').click(function(){
+  ipcRenderer.send('deleteBuild');
 });
 
 $('button.champs').click(function() {
@@ -36,8 +43,8 @@ $('button.champs').click(function() {
 });
 
 $('.buttons .maps .dropdown-item').click(function() {
-  var map = ($(this).data("map") || 11);
-  var mode = ($(this).data("mode") || "CLASSIC");
+  var map = ($(this).data('map') || 11);
+  var mode = ($(this).data('mode') || 'CLASSIC');
   mapData = {map: map, mode: mode};
   $('.buttons .maps .dropdown-toggle').text($(this).text());
   $('button.go').click();
@@ -57,18 +64,24 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   var skills = message.skills;
   var masteries = message.masteries;
   var goldTotal = 0;
-  baseImageURL = message.versions.cdn + "/" + message.versions.v + "/img/";
-  artImageURL = message.versions.cdn + "/img/champion/";
+  baseImageURL = message.versions.cdn + '/' + message.versions.v + '/img/';
+  artImageURL = message.versions.cdn + '/img/champion/';
 
   //RANDOM SKIN FOR ART
   var randomSkin = champ.skins[Math.floor(Math.random()*champ.skins.length)];
   var nameText = randomSkin.name;
-  if(nameText == "default") {nameText = champ.name;}
+  if(nameText === 'default') {nameText = champ.name;}
   $('.champ-skin-name').text(nameText);
 
+  $('.champ-skin-name').off();
+
+  $('.champ-skin-name').click(function(){
+    ipcRenderer.send('openURL', `${artImageURL}splash/${champ.key}_${randomSkin.num}.jpg`);
+  });
+
   //CHAMP-RELATED IMAGES
-  $('.champ-icon').css("background-image", buildBackgroundImageURL(baseImageURL + 'champion/' + champ.image.full));
-  $('.app-container').css("background-image", buildBackgroundImageURL(`${artImageURL}splash/${champ.key}_${randomSkin.num}.jpg`));
+  $('.champ-icon').css('background-image', buildBackgroundImageURL(baseImageURL + 'champion/' + champ.image.full));
+  $('.app-container').css('background-image', buildBackgroundImageURL(`${artImageURL}splash/${champ.key}_${randomSkin.num}.jpg`));
 
   //SPELLS
   $('.spells div').tooltip('dispose');
@@ -76,7 +89,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   $('.spells div').tooltip();
 
   //CHAMP NAME
-  $('.build-name').text(message.adjective.toUpperCase() + " " + champ.name.toUpperCase());
+  $('.build-name').text(message.adjective.toUpperCase() + ' ' + champ.name.toUpperCase());
 
   //ITEMS
   $('.items').empty();
@@ -88,14 +101,14 @@ ipcRenderer.on('buildGenerated', function(event, message) {
 
   $('.items div').tooltip();
 
-  $('.gold').text("Total Gold: " + goldTotal);
+  $('.gold').text('Total Gold: ' + goldTotal);
 
   //SKILLS
   $('.skills').empty();
 
   for (var i = 0; i < skills.order.length; i++) {
     $('.skills').append(createSkillDiv(skills[skills.order[i]], skills.order[i]));
-    $('.skills').append("<div class='skill-spacer'>&gt;</div>")
+    $('.skills').append(`<div class='skill-spacer'>&gt;</div>`);
   }
 
   $('.skills div').tooltip();
@@ -106,22 +119,22 @@ ipcRenderer.on('buildGenerated', function(event, message) {
 });
 
 function buildBackgroundImageURL(url) {
-  return "url(" + url + ")";
+  return 'url(' + url + ')';
 }
 
 function createMasteriesSpans(masteries) {
   var trees = {
-    0: "ferocity",
-    1: "cunning",
-    2: "resolve"
+    0: 'ferocity',
+    1: 'cunning',
+    2: 'resolve'
   };
 
-  var spanString = "";
+  var spanString = '';
 
   for (var i = 0; i < masteries.length; i++) {
-    spanString += `<span class="mastery-${trees[i]}">${masteries[i]}</span>`
+    spanString += `<span class='mastery-${trees[i]}'>${masteries[i]}</span>`;
     if(i !== masteries.length - 1) {
-      spanString += "/";
+      spanString += '/';
     }
   }
 
@@ -129,24 +142,24 @@ function createMasteriesSpans(masteries) {
 }
 
 function createSpellDiv(spell) {
-  var title = spell.name + " - " + spell.sanitizedDescription;
-  var url = baseImageURL + "spell/" + spell.image.full;
-  var context = {type: "spell", url: url, title: title};
+  var title = spell.name + ' - ' + spell.sanitizedDescription;
+  var url = baseImageURL + 'spell/' + spell.image.full;
+  var context = {type: 'spell', url: url, title: title};
   return createObjectDiv(context);
 }
 
 function createItemDiv(item) {
-  var title = item.name + " - " + item.plaintext;
-  var url = baseImageURL + "item/" + item.image;
-  var context = {type: "item", url: url, title: title};
+  var title = item.name + ' - ' + item.plaintext;
+  var url = baseImageURL + 'item/' + item.image;
+  var context = {type: 'item', url: url, title: title};
   return createObjectDiv(context);
 }
 
 function createSkillDiv(skill, key) {
-  var title = skill.name + " - " + skill.description;
-  var url = baseImageURL + "spell/" + skill.image;
+  var title = skill.name + ' - ' + skill.description;
+  var url = baseImageURL + 'spell/' + skill.image;
   var inner = key;
-  var context = {type: "skill", url: url, title: title, inner: inner};
+  var context = {type: 'skill', url: url, title: title, inner: inner};
   return createObjectDiv(context);
 }
 
@@ -155,25 +168,25 @@ function createObjectDiv(obj) {
 }
 
 function copyToClipboard(build) {
-  var string = build.adjective.toUpperCase() + " " + build.champ.name.toUpperCase();
-  var skills = "";
+  var string = build.adjective.toUpperCase() + ' ' + build.champ.name.toUpperCase();
+  var skills = '';
   for (var i = 0; i < build.skills.order.length; i++) {
-    skills += build.skills.order[i] + " > ";
+    skills += build.skills.order[i] + ' > ';
   }
   skills = skills.slice(0, -3);
-  var masteries = "";
+  var masteries = '';
   for (var i = 0; i < build.masteries.length; i++) {
-    masteries += build.masteries[i] + "/";
+    masteries += build.masteries[i] + '/';
   }
   masteries = masteries.slice(0, -1);
 
   string += ` (${build.spells[0].name} / ${build.spells[1].name} / ${skills}) (${masteries}) with `;
 
   for (var i = 0; i < build.items.length; i++) {
-    string += build.items[i].name + ", ";
+    string += build.items[i].name + ', ';
   }
 
-  string = string.slice(0, -2) + ".";
+  string = string.slice(0, -2) + '.';
 
   clipboard.writeText(string);
 }

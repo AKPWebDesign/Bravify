@@ -1,5 +1,5 @@
-var Promise = require("bluebird");
-var chance = new (require("chance"))();
+var Promise = require('bluebird'); // jshint ignore:line
+var chance = new (require('chance'))();
 
 function BuildGenerator(APIData) {
   this.APIData = APIData;
@@ -7,23 +7,26 @@ function BuildGenerator(APIData) {
   this.adjectives = require('./Adjectives');
 
   this.badItemTags = [
-    "Boots",
-    "Jungle",
-    "Consumable",
-    "JungleItems"
-  ]
+    'Boots',
+    'Jungle',
+    'Consumable',
+    'JungleItems'
+  ];
 }
 
 BuildGenerator.prototype.generate = function (mapData) {
   var self = this;
   var map = mapData.map;
   var mode = mapData.mode;
-  return new Promise(function(resolve, reject) {
-    var champ = self.genChamp();
+  return new Promise(function(resolve) {
+    var skills, champ;
+    while(!skills) {
+      champ = self.genChamp();
+      skills = self.genSkills(champ);
+    }
     var spells = self.genSpells(mode);
     var hasSmite = spells.includes(self.APIData.summonerSpells.SummonerSmite);
     var items = self.genItems(champ.name, map, hasSmite, false); //TODO: Pull duplicatesAllowed value from UI.
-    var skills = self.genSkills(champ);
     var adjective = self.genAdjective();
     resolve({champ: champ, items: items, spells: spells, skills: skills, masteries: self.genMasteries(), adjective: adjective, versions: self.APIData.versionData});
   });
@@ -51,12 +54,12 @@ BuildGenerator.prototype.genMasteries = function () {
 };
 
 BuildGenerator.prototype.genSkills = function (champ) {
-  var skillToKey = ["Q", "W", "E", "R"];
+  var skillToKey = ['Q', 'W', 'E', 'R'];
   var choices = [];
   var skills = {};
 
   for (var i = 0; i < champ.spells.length; i++) {
-    if(champ.spells[i].maxrank == 5) {
+    if(champ.spells[i].maxrank >= 5) {
       skills[skillToKey[i]] = {
         image: champ.spells[i].image.full,
         name: champ.spells[i].name,
@@ -64,6 +67,10 @@ BuildGenerator.prototype.genSkills = function (champ) {
       };
       choices.push(skillToKey[i]);
     }
+  }
+
+  if(!choices || !choices.length) {
+    return null;
   }
 
   skills.order = chance.pickset(choices, 4);
@@ -79,11 +86,11 @@ BuildGenerator.prototype.genItems = function (champion, map, hasSmite, duplicate
   //console.log(`Generating items for map: ${map}.`)
 
   //first item will be boots.
-  items.push(this.newItem(map, null, "1001")); //generate item starting with basic boots.
+  items.push(this.newItem(map, null, '1001')); //generate item starting with basic boots.
 
   //second item will be a jungle item, if we have smite.
   if(hasSmite) {
-    items.push(this.newItem(map, null, "1041")); //generate item starting with Hunter's Machete.
+    items.push(this.newItem(map, null, '1041')); //generate item starting with Hunter's Machete.
   }
 
   for(var i; items.length < 6; i++) {
@@ -103,8 +110,8 @@ BuildGenerator.prototype.genItems = function (champion, map, hasSmite, duplicate
 
       ids.push(item.id);
 
-      //if we have a "required champion", we make sure that we generated the right champ for this item.
-      if((item.requiredChampion && (item.requiredChampion == champion)) || !item.requiredChampion) {
+      //if we have a 'required champion', we make sure that we generated the right champ for this item.
+      if((item.requiredChampion && (item.requiredChampion === champion)) || !item.requiredChampion) {
         if(item.group) {
           if(!groups.includes(item.group)) {
             items.push(item);
@@ -129,7 +136,7 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
   var items = this.APIData.itemKeys;
   var itemPath = [];
 
-  itemPath.push("============================================================");
+  itemPath.push('============================================================');
 
   while(!done) {
     if(currentItem) {
@@ -192,7 +199,7 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
       }
     }
 
-    if(currentItem == null) {
+    if(currentItem === null) {
       done = false;
     }
   }
@@ -215,11 +222,11 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
 
   var name = item.name;
 
-  if(name.startsWith("Enchantment:")) {
+  if(name.startsWith('Enchantment:')) {
     if(lastItem) {
-      var ind = name.indexOf(" ");
+      var ind = name.indexOf(' ');
       name = name.slice(ind);
-      name = this.APIData.items[lastItem].name + " - " + name;
+      name = this.APIData.items[lastItem].name + ' - ' + name;
     }
   }
 
@@ -232,7 +239,7 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
     image: item.image.full,
     requiredChampion: item.requiredChampion,
     group: item.group
-  }
+  };
 
   return obj;
 };
