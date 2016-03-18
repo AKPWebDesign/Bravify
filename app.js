@@ -52,6 +52,7 @@ app.on('ready', function() {
     show: false,
     frame: false,
     transparent: true,
+    icon: __dirname + '/resources/icon.png',
     title: 'Bravify'});
 
   // and load the index.html of the app.
@@ -267,6 +268,7 @@ function openChampSelectWindow() {
       show: false,
       frame: false,
       transparent: true,
+      icon: __dirname + '/resources/icon.png',
       title: 'Bravify Champ Select'});
 
     champSelectWindow.loadURL('file://' + __dirname + '/html/champions.html');
