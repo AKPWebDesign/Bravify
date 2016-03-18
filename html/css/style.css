@@ -130,7 +130,7 @@ html, body {
           transform: translate(-50%, -50%);
 }
 
-.champ-frame {
+.champ-frame, .offline-frame {
   display: none;
 }
 
@@ -256,7 +256,7 @@ html, body {
   padding: 10px;
 }
 
-.loading-frame {
+.loading-frame, .offline-frame {
   position: absolute;
   width: 90%;
   text-align: center;
@@ -272,5 +272,5 @@ html, body {
 }
 
 .loading-frame progress[value]::-webkit-progress-value {
-  transition: width 1.25s ease-in-out;
+  transition: width .3s ease-in-out;
 }

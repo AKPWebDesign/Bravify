@@ -8,8 +8,13 @@ $(document).ready(function() {
   objectTemplate = Handlebars.compile($('#object-template').html());
 });
 
+$('button.reload').click(function() {
+  $('.offline-frame').fadeOut(250);
+  $('.loading-frame').fadeIn(250);
+  ipcRenderer.send('reloadData');
+});
 
-$('button.go').click(function(){
+$('button.go').click(function() {
   ipcRenderer.send('generateNewBuild', mapData);
 });
 

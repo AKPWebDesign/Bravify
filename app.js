@@ -60,16 +60,7 @@ app.on('ready', function() {
   mainWindow.webContents.on('did-finish-load', function(){
     mainWindow.show();
     //begin loading API data.
-    APIData.loadAll(function(index, length) {
-      var percent = index/length;
-      mainWindow.webContents.send('updateProgressBar', percent);
-    }).then(function() {
-      mainWindow.webContents.send('finishedLoading', true);
-    }, function(error) {
-      dialog.showErrorBox('Error!', error.toString()); //TODO: Handle errors better.
-    }).catch(function(error) {
-      dialog.showErrorBox('Caught Exception!', error.toString()); //TODO: Handle errors better.
-    });
+    loadData();
   });
 
   // Emitted when the window is closed.
@@ -292,6 +283,23 @@ function openChampSelectWindow() {
   }
 }
 
+function loadData() {
+  APIData.loadAll(function(index, length) {
+    var percent = index/length;
+    mainWindow.webContents.send('updateProgressBar', percent);
+  }).then(function() {
+    mainWindow.webContents.send('finishedLoading', true);
+  }, function(error) {
+    if(error === 'offline') {
+      mainWindow.webContents.send('offline');
+    } else {
+      console.log('Error: ' + error); //TODO: Handle errors better.
+    }
+  }).catch(function(error) {
+    console.log('Exception: ' + error); //TODO: Handle errors better.
+  });
+}
+
 // The methods below will be called upon receiving various messages from our
 // rendering thread. These are used to do things in the app when the user clicks
 // on things in the interface.
@@ -325,4 +333,8 @@ ipcMain.on('newChampSelection', function(event, champs) {
 ipcMain.on('closeChampsWindow', function() {
   if(!champSelectWindow) {return;}
   champSelectWindow.close();
+});
+
+ipcMain.on('reloadData', function() {
+  loadData();
 });

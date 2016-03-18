@@ -61,21 +61,54 @@ APIData.prototype.loadAll = function (progressFunction) {
 
   //check version we have against Riot version.
   return this.loadVersionData(region, version).then(function(result) {
-    self.versionData = result.data;
+    var offline = false;
+    if(result && result.data) {
+      self.versionData = result.data;
+    } else {
+      offline = true;
+    }
+
     if(fs.existsSync(path.join(self.dataPath, 'data.json'))) {
       try {
         var data = jsonfile.readFileSync(path.join(self.dataPath, 'data.json'));
-        if(data.versions.v !== result.data.v) {
+        if(!offline && data.versions.v !== result.data.v) {
           return self.loadFromServer(region, version, progressFunction);
         } else {
           return self.loadFromCache(data, progressFunction);
         }
       } catch(e) {
-        return self.loadFromServer(region, version, progressFunction);
+        if(!offline) {
+          return self.loadFromServer(region, version, progressFunction);
+        }
       }
     } else {
-      return self.loadFromServer(region, version, progressFunction);
+      if(!offline) {
+        return self.loadFromServer(region, version, progressFunction);
+      }
     }
+
+    if(offline) {
+      return new Promise(function(resolve, reject) {
+        reject('offline');
+      });
+    }
+  }, function() {
+    if(fs.existsSync(path.join(self.dataPath, 'data.json'))) {
+      try {
+        var data = jsonfile.readFileSync(path.join(self.dataPath, 'data.json'));
+        if(data) {
+          return self.loadFromCache(data, progressFunction);
+        }
+      } catch(e) {
+        return new Promise(function(resolve, reject) {
+          reject('offline');
+        });
+      }
+    } else {
+        return new Promise(function(resolve, reject) {
+          reject('offline');
+        });
+      }
   });
 };
 
