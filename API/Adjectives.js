@@ -123,7 +123,20 @@ var adjectives = [
   "2 spooky",
   "\"that's not funny\"",
   "mid or afk",
-  "just uninstall now"
+  "just uninstall now",
+  "first blood",
+  "first blooded",
+  "i'm a smurf",
+  "asshat",
+  "best {champ} na",
+  "best {champ} eu",
+  "best {champ} korea",
+  "best {champ} world"
+  "worst {champ} na",
+  "worst {champ} eu",
+  "worst {champ} korea",
+  "worst {champ} world"
+  "i agree, nerf"
 ];
 
 module.exports = adjectives;

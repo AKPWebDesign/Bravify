@@ -89,7 +89,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   $('.spells div').tooltip();
 
   //CHAMP NAME
-  $('.build-name').text(message.adjective.toUpperCase() + ' ' + champ.name.toUpperCase());
+  $('.build-name').text(message.adjective.toUpperCase());
 
   //ITEMS
   $('.items').empty();
