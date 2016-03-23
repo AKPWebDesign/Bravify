@@ -131,11 +131,11 @@ var adjectives = [
   "best {champ} na",
   "best {champ} eu",
   "best {champ} korea",
-  "best {champ} world"
+  "best {champ} world",
   "worst {champ} na",
   "worst {champ} eu",
   "worst {champ} korea",
-  "worst {champ} world"
+  "worst {champ} world",
   "i agree, nerf"
 ];
 
