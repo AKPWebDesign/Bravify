@@ -168,7 +168,7 @@ function createObjectDiv(obj) {
 }
 
 function copyToClipboard(build) {
-  var string = build.adjective.toUpperCase() + ' ' + build.champ.name.toUpperCase();
+  var string = build.adjective.toUpperCase();
   var skills = '';
   for (var i = 0; i < build.skills.order.length; i++) {
     skills += build.skills.order[i] + ' > ';

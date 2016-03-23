@@ -24,7 +24,7 @@ ItemSetGenerator.prototype.generate = function (build) {
 
 
   //title set
-  itemSet.title = build.adjective.toUpperCase() + ' ' + build.champ.name.toUpperCase();
+  itemSet.title = build.adjective.toUpperCase();
 
   //set champion for set
   itemSet.champion = build.champ.key;
