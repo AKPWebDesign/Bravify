@@ -64,7 +64,7 @@ new Promise(function(resolve){
       app.quit();
     });
   });
-}).then(require('./API/Autoupdate')).then(function() {
+}).then(require('./API/Autoupdate')(mainWindow)).then(function() {
   // Load data from Riot APIs when we start the application.
   APIData = new (require('./API/APIData'))(getPrefDir());
   BuildGenerator = new (require('./API/BuildGenerator'))(APIData);

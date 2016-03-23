@@ -140,7 +140,7 @@ html, body {
           transform: translate(-50%, -50%);
 }
 
-.champ-frame, .offline-frame {
+.champ-frame, .offline-frame, .loading-frame {
   display: none;
 }
 
@@ -267,7 +267,7 @@ html, body {
   cursor: pointer;
 }
 
-.loading-frame, .offline-frame {
+.loading-frame, .offline-frame, .updating-frame {
   position: absolute;
   width: 90%;
   text-align: center;

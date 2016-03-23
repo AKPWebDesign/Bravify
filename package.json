@@ -28,6 +28,7 @@
     "open": "0.0.5",
     "pretty-error": "^2.0.0",
     "request-json": "^0.5.5",
+    "request-progress": "^2.0.1",
     "titlebar": "^1.4.0"
   }
 }
