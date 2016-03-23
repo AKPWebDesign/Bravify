@@ -8,11 +8,11 @@ module.exports = new Promise(function(resolve, reject) {
 
   //check for updated version
   checkForUpdate('v'+pkg.version).then(function(res) {
-    //if res is false, we need to download.
+    //if res is false, we don't need to download.
     if(!res) {
-      return downloadUpdate();
-    } else {
       return false;
+    } else {
+      return downloadUpdate();
     }
   }).then(function(res) {
     if(!res) {

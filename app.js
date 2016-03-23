@@ -17,21 +17,17 @@ const fs = require('fs'); // filesystem tools
 const jsonfile = require('jsonfile'); //tools for saving JSON to files.
 const mkdirp = require('mkdirp'); //recursive mkdir
 const homedir = require('homedir'); //home directory finder
+var Promise = require('bluebird'); // jshint ignore:line
 
 var APIData, BuildGenerator, ItemSetGenerator;
 
-//run autoupdater first thing.
-require('./API/Autoupdate').then(function() {
-  // Load data from Riot APIs when we start the application.
-  APIData = new (require('./API/APIData'))(getPrefDir());
-  BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
-  ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+var mainWindow = null;
+var champSelectWindow = null;
 
-  // Keep a global reference of the window object, if you don't, the window will
-  // be closed automatically when the JavaScript object is garbage collected.
-  var mainWindow = null;
-  var champSelectWindow = null;
-
+//create window, then run autoupdater, then start application.
+new Promise(function(resolve){
   // Quit when all windows are closed.
   app.on('window-all-closed', function() {
     // On OS X it is common for applications and their menu bar
@@ -64,8 +60,7 @@ require('./API/Autoupdate').then(function() {
 
     mainWindow.webContents.on('did-finish-load', function(){
       mainWindow.show();
-      //begin loading API data.
-      loadData(mainWindow);
+      resolve(true);
     });
 
     // Emitted when the window is closed.
@@ -80,6 +75,14 @@ require('./API/Autoupdate').then(function() {
       app.quit();
     });
   });
+}).then(require('./API/Autoupdate')).then(function() {
+  // Load data from Riot APIs when we start the application.
+  APIData = new (require('./API/APIData'))(getPrefDir());
+  BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
+  ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
+
+  //load API data to window.
+  loadData(mainWindow);
 
   // Called when the client requests a new build to be generated
   ipcMain.on('generateNewBuild', function(event, message) {
@@ -342,6 +345,7 @@ function openWindow(window) {
 }
 
 function loadData(window) {
+  window.webContents.send('startDataLoad');
   APIData.loadAll(function(index, length) {
     var percent = index/length;
     window.webContents.send('updateProgressBar', percent);
