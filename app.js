@@ -40,14 +40,18 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
+  var w = 1050;
+  var h = 600;
+  var loc = getNewWindowLocation(null, w, h);
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1050,
-    height: 600,
-    'min-width': 1050,
-    'min-height': 600,
+    width: w,
+    height: h,
+    'min-width': w,
+    'min-height': h,
     fullscreen: false,
-    center: true,
+    x: loc.x,
+    y: loc.y,
     resizable: true,
     show: false,
     frame: false,
@@ -75,29 +79,6 @@ app.on('ready', function() {
     }
     app.quit();
   });
-});
-
-// Called when the client requests a new build to be generated
-ipcMain.on('generateNewBuild', function(event, message) {
-  BuildGenerator.generate(message).then(function(result) {
-    mainWindow.webContents.send('buildGenerated', result);
-  });
-});
-
-ipcMain.on('saveBuild', function(event, message) {
-  if(message.build) {
-    var set = ItemSetGenerator.generate(message.build);
-    saveBuild(set);
-    mainWindow.webContents.send('itemSetSaved', set);
-  }
-});
-
-ipcMain.on('deleteBuild', function() {
-  deleteBuild();
-});
-
-ipcMain.on('changeLeaguePath', function() {
-  getLeaguePath(false);
 });
 
 function deleteBuild() {
@@ -259,11 +240,15 @@ function getPrefDir() {
 
 function openChampSelectWindow() {
   if(!champSelectWindow) {
+    var w = 557;
+    var h = 647;
+    var loc = getNewWindowLocation(mainWindow, w, h);
     champSelectWindow = new BrowserWindow({
-      width: 557,
-      height: 647,
+      width: w,
+      height: h,
       fullscreen: false,
-      center: true,
+      x: loc.x,
+      y: loc.y,
       resizable: false,
       show: false,
       frame: false,
@@ -300,6 +285,23 @@ function loadData() {
   }).catch(function(error) {
     console.log('Exception: ' + error); //TODO: Handle errors better.
   });
+}
+
+function getNewWindowLocation(window, width, height) {
+  var point;
+  var screen = electron.screen;
+  if(!window) {
+    point = screen.getCursorScreenPoint();
+  } else {
+    point = {x:window.getPosition()[0], y:window.getPosition()[1]}; //this is stupid.
+  }
+
+  var display = screen.getDisplayNearestPoint(point);
+
+  var x = Math.round(display.workArea.x + display.workArea.width/2 - width/2);
+  var y = Math.round(display.workArea.y + display.workArea.height/2 - height/2);
+
+  return {x: x, y: y};
 }
 
 // The methods below will be called upon receiving various messages from our
@@ -346,4 +348,27 @@ ipcMain.on('openURL', function(event, message) {
   if(message) {
     open(message);
   }
+});
+
+// Called when the client requests a new build to be generated
+ipcMain.on('generateNewBuild', function(event, message) {
+  BuildGenerator.generate(message).then(function(result) {
+    mainWindow.webContents.send('buildGenerated', result);
+  });
+});
+
+ipcMain.on('saveBuild', function(event, message) {
+  if(message.build) {
+    var set = ItemSetGenerator.generate(message.build);
+    saveBuild(set);
+    mainWindow.webContents.send('itemSetSaved', set);
+  }
+});
+
+ipcMain.on('deleteBuild', function() {
+  deleteBuild();
+});
+
+ipcMain.on('changeLeaguePath', function() {
+  getLeaguePath(false);
 });
