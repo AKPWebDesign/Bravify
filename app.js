@@ -56,7 +56,7 @@ new Promise(function(resolve){
 
     mainWindow.webContents.on('did-finish-load', function(){
       mainWindow.show();
-      resolve(true);
+      resolve(mainWindow);
     });
 
     // Emitted when the window is closed.
@@ -64,7 +64,10 @@ new Promise(function(resolve){
       app.quit();
     });
   });
-}).then(require('./API/Autoupdate')(mainWindow)).then(function() {
+}).then(function(window) {
+  return require('./API/Autoupdate')(window);
+}).then(function(updated) {
+  if(updated) {return;} // Do this to stop the main load from happening if we're updating.
   // Load data from Riot APIs when we start the application.
   APIData = new (require('./API/APIData'))(getPrefDir());
   BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
@@ -73,74 +76,6 @@ new Promise(function(resolve){
   //load API data to window.
   loadData(mainWindow);
 
-  // Called when the client requests a new build to be generated
-  ipcMain.on('generateNewBuild', function(event, message) {
-    BuildGenerator.generate(message).then(function(result) {
-      mainWindow.webContents.send('buildGenerated', result);
-    });
-  });
-
-  ipcMain.on('saveBuild', function(event, message) {
-    if(message.build) {
-      var set = ItemSetGenerator.generate(message.build);
-      saveBuild(set);
-      mainWindow.webContents.send('itemSetSaved', set);
-    }
-  });
-
-  ipcMain.on('deleteBuild', function() {
-    deleteBuild();
-  });
-
-  ipcMain.on('changeLeaguePath', function() {
-    getLeaguePath(false);
-  });
-
-  // The methods below will be called upon receiving various messages from our
-  // rendering thread. These are used to do things in the app when the user clicks
-  // on things in the interface.
-  ipcMain.on('close-main-window', function() {
-    app.quit();
-  });
-
-  ipcMain.on('minimize-main-window', function() {
-    mainWindow.minimize();
-  });
-
-  ipcMain.on('maximize-main-window', function() {
-    (mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize()); // jshint ignore:line
-  });
-
-  ipcMain.on('openChampSelect', function() {
-    champSelectWindow = openWindow(champSelectWindow);
-  });
-
-  ipcMain.on('retrieveChamps', function() {
-    if(!champSelectWindow) {return;}
-    champSelectWindow.webContents.send('champions', {champs: APIData.champs, versions: APIData.versionData, groups: require('./API/groups.json'), selected: APIData.champKeys});
-  });
-
-  ipcMain.on('newChampSelection', function(event, champs) {
-    if(!champs) {return;}
-    APIData.champKeys = champs;
-    mainWindow.webContents.send('champsChanged');
-  });
-
-  ipcMain.on('closeChampsWindow', function() {
-    if(!champSelectWindow) {return;}
-    champSelectWindow.close();
-  });
-
-  ipcMain.on('reloadData', function() {
-    loadData(mainWindow);
-  });
-
-  ipcMain.on('openURL', function(event, message) {
-    var open = require('open');
-    if(message) {
-      open(message);
-    }
-  });
 }, function(err) {
   dialog.showErrorBox('Bravify Error!', 'An error has occurred:\n' + err);
   process.exit(1);
@@ -350,3 +285,72 @@ function loadData(window) {
     console.log('Exception: ' + error); //TODO: Handle errors better.
   });
 }
+
+// The methods below will be called upon receiving various messages from our
+// rendering thread. These are used to do things in the app when the user clicks
+// on things in the interface.
+ipcMain.on('close-main-window', function() {
+  app.quit();
+});
+
+ipcMain.on('minimize-main-window', function() {
+  mainWindow.minimize();
+});
+
+ipcMain.on('maximize-main-window', function() {
+  (mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize()); // jshint ignore:line
+});
+
+ipcMain.on('openChampSelect', function() {
+  champSelectWindow = openWindow(champSelectWindow);
+});
+
+ipcMain.on('retrieveChamps', function() {
+  if(!champSelectWindow) {return;}
+  champSelectWindow.webContents.send('champions', {champs: APIData.champs, versions: APIData.versionData, groups: require('./API/groups.json'), selected: APIData.champKeys});
+});
+
+ipcMain.on('newChampSelection', function(event, champs) {
+  if(!champs) {return;}
+  APIData.champKeys = champs;
+  mainWindow.webContents.send('champsChanged');
+});
+
+ipcMain.on('closeChampsWindow', function() {
+  if(!champSelectWindow) {return;}
+  champSelectWindow.close();
+});
+
+ipcMain.on('reloadData', function() {
+  loadData(mainWindow);
+});
+
+ipcMain.on('openURL', function(event, message) {
+  var open = require('open');
+  if(message) {
+    open(message);
+  }
+});
+
+// Called when the client requests a new build to be generated
+ipcMain.on('generateNewBuild', function(event, message) {
+  BuildGenerator.generate(message).then(function(result) {
+    mainWindow.webContents.send('buildGenerated', result);
+  });
+});
+
+ipcMain.on('saveBuild', function(event, message) {
+  if(message.build) {
+    var set = ItemSetGenerator.generate(message.build);
+    saveBuild(set);
+    mainWindow.webContents.send('itemSetSaved', set);
+  }
+});
+
+ipcMain.on('deleteBuild', function() {
+  deleteBuild();
+});
+
+ipcMain.on('changeLeaguePath', function() {
+  getLeaguePath(false);
+});

@@ -1,6 +1,6 @@
 var Promise = require('bluebird'); // jshint ignore:line
-var remote = require('remote');
-var app = remote.require('app');
+var electron = require('electron');
+var app = electron.app;
 var request = require('request-json');
 var r = require('request');
 var progress = require('request-progress');
@@ -17,17 +17,10 @@ module.exports = function(window){
     checkForUpdate('v'+pkg.version).then(function(res) {
       //if res is false, we don't need to download.
       if(!res) {
-        return false;
+        resolve(false);
       } else {
-        return downloadUpdate(window, res);
-      }
-    }).then(function(res) {
-      if(!res) {
-        //either the update failed, or we don't have an update.
-        resolve(true); //TODO: watch for errors.
-      } else {
-        //restart program somehow.
-        resolve(restartProgram());
+        downloadUpdate(window, res);
+        resolve(true);
       }
     });
   });
@@ -46,7 +39,7 @@ function checkForUpdate(currentVer) {
 
 function downloadUpdate(window, version) {
   var url = `https://github.com/AKPWebDesign/Bravify/releases/download/${version}/app.asar`;
-  var app_asar = path.join(__dirname, '../');
+  var app_asar = path.join(__dirname, '../').slice(0, -1);
   var update_asar = path.join(__dirname, '../../', 'update-asar');
   return downloadFile(url, update_asar, window).then(function(){
     if(process.platform === 'win32') {
@@ -55,10 +48,6 @@ function downloadUpdate(window, version) {
       nixMinorUpdate(app_asar, update_asar);
     }
   });
-}
-
-function restartProgram() {
-  return true;
 }
 
 function downloadFile(url, downloadPath, window) {
@@ -73,15 +62,16 @@ function downloadFile(url, downloadPath, window) {
     }
 
     var lastPercent = 0;
-    progress(r(url), {throttle: 500}).on('progress', function(state){
-      if(state.percent > lastPercent) {
-        lastPercent = state.percent;
-        window.webContents.send('update-download-progress', {p: state.percent});
+    progress(r(url), {throttle: 50}).on('progress', function(state){
+      if(state.percentage > lastPercent) {
+        lastPercent = state.percentage;
+        window.webContents.send('updateProgressBar', state.percentage);
       }
     }).on('error', function(err) {
       reject(err);
     }).pipe(file).on('close', function() {
       file.close();
+      window.webContents.send('updateProgressBar', 1);
       resolve();
     });
   });
@@ -91,11 +81,11 @@ function nixMinorUpdate(app_asar, update_asar) {
   var fs = require('fs');
   fs.unlink(app_asar, function(err) {
     if(err) {
-      console.err('Can\'t remove app.asar.', err);
+      console.error('Can\'t remove app.asar.', err);
       return;
     }
     fs.rename(update_asar, app_asar, function(err) {
-      if(err) {console.err('Can\'t rename update.asar.', err);}
+      if(err) {console.error('Can\'t rename update.asar.', err); return;}
       var appPath;
       if(process.platform === 'darwin') {
         appPath = __dirname.replace('/Contents/Resources/app.asar/js', '');
@@ -110,5 +100,23 @@ function nixMinorUpdate(app_asar, update_asar) {
 }
 
 function winMinorUpdate(app_asar, update_asar) {
+  var appPath = process.execPath;
+  var processName = path.basename(appPath);
+  var cmd =`
+    @echo off
+    title Updating Bravify
+    echo Updating Bravify, please wait...
+    taskkill /IM ${processName} /f
+    ping 1.1.1.1 -n 1 -w 1000 > nul
+    del "${app_asar}"
+    ren "${update_asar}" app.asar
+    start "" "${appPath}"
+    exit`;
 
+  var batchFile = path.join(process.env.APPDATA, 'Bravify', 'update.bat');
+
+  require('fs').writeFile(batchFile, cmd, function(err) {
+    if(err) {console.error('Can\'t save update batch file!', err); return;}
+    exec(`START "" "${batchFile}"`);
+  });
 }

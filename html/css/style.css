@@ -277,11 +277,11 @@ html, body {
   padding: 20px 0;
 }
 
-.loading-frame progress {
+.loading-frame progress, .updating-frame progress {
   width: 90%;
   margin: 0 auto;
 }
 
-.loading-frame progress[value]::-webkit-progress-value {
+.loading-frame progress[value]::-webkit-progress-value, .updating-frame progress[value]::-webkit-progress-value {
   transition: width .3s ease-in-out;
 }
