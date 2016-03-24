@@ -27,7 +27,7 @@ BuildGenerator.prototype.generate = function (mapData) {
     var spells = self.genSpells(mode);
     var hasSmite = spells.includes(self.APIData.summonerSpells.SummonerSmite);
     var items = self.genItems(champ.name, map, hasSmite, false); //TODO: Pull duplicatesAllowed value from UI.
-    var adjective = self.genAdjective();
+    var adjective = self.genAdjective(champ.name);
     resolve({champ: champ, items: items, spells: spells, skills: skills, masteries: self.genMasteries(), adjective: adjective, versions: self.APIData.versionData});
   });
 };
@@ -41,8 +41,15 @@ BuildGenerator.prototype.genSpells = function (mode) {
   return set.map(s => this.APIData.summonerSpells[s]);
 };
 
-BuildGenerator.prototype.genAdjective = function () {
-  return chance.pickone(this.adjectives);
+BuildGenerator.prototype.genAdjective = function (champ) {
+  var adj = chance.pickone(this.adjectives);
+  if(adj.includes("{champ}")) {
+    adj = adj.replace(/{champ}/i, champ);
+  } else {
+    adj = adj + " " + champ;
+  }
+
+  return adj;
 };
 
 BuildGenerator.prototype.genMasteries = function () {

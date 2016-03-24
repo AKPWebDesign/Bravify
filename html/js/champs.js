@@ -26,21 +26,23 @@ $(document).ready(function(){
 
 ipcRenderer.on('champions', function(event, message) {
   var key;
+  var count = 0;
   groupData = message.groups;
   selectedChamps = message.selected;
   $('.champion-list-container').empty();
   baseImageURL = message.versions.cdn + '/' + message.versions.v + '/img/';
   for (key in message.champs) {
     if (message.champs.hasOwnProperty(key)) {
-      champsByName[message.champs[key].name] = message.champs[key];
+      $('.champion-list-container').append(createChampDiv(message.champs[key]));
+      count++;
     }
   }
-  console.log(champsByName);
-  for (key in champsByName) {
-    if (champsByName.hasOwnProperty(key)) {
-      $('.champion-list-container').append(createChampDiv(champsByName[key]));
-    }
+
+  if($('.selected').length === count) {
+    selectNone();
   }
+
+  sortElements();
 
   $('.champ-item-container').each(function(){
     $(this).click(function(){
@@ -111,4 +113,13 @@ function selectNone() {
   $('.champ-item-container').each(function(){
     $(this).removeClass('selected');
   });
+}
+
+function sortElements() {
+  var div = $('.champion-list-container');
+  var items = div.children('div').get();
+  items.sort(function(a, b) {
+     return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+  });
+  $.each(items, function(idx, itm) { div.append(itm); });
 }

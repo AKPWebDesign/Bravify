@@ -1,33 +1,8 @@
 {
-    "map": "SR",
+    "map": "any",
     "blocks": [
         {
-            "items": [
-                {
-                    "id": "3031",
-                    "count": 1
-                },
-                {
-                    "id": "3094",
-                    "count": 1
-                },
-                {
-                    "id": "3006",
-                    "count": 1
-                },
-                {
-                    "id": "3072",
-                    "count": 1
-                },
-                {
-                    "id": "3036",
-                    "count": 1
-                },
-                {
-                    "id": "3139",
-                    "count": 1
-                }
-            ],
+            "items": [],
             "type": "Main Build"
         },
         {
@@ -90,7 +65,7 @@
         }
     ],
     "title": "",
-    "priority": true,
+    "priority": false,
     "mode": "any",
     "type": "custom",
     "sortrank": 99999,

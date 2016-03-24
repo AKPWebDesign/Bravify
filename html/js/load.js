@@ -16,3 +16,9 @@ ipcRenderer.on('offline', function() {
   $('.loading-frame').fadeOut(250);
   $('.offline-frame').fadeIn(250);
 });
+
+ipcRenderer.on('startDataLoad', function() {
+  $('progress.progress').val(0);
+  $('.updating-frame').fadeOut(250);
+  $('.loading-frame').fadeIn(250);
+});

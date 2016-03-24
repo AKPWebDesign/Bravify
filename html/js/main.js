@@ -89,7 +89,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   $('.spells div').tooltip();
 
   //CHAMP NAME
-  $('.build-name').text(message.adjective.toUpperCase() + ' ' + champ.name.toUpperCase());
+  $('.build-name').text(message.adjective.toUpperCase());
 
   //ITEMS
   $('.items').empty();
@@ -168,7 +168,7 @@ function createObjectDiv(obj) {
 }
 
 function copyToClipboard(build) {
-  var string = build.adjective.toUpperCase() + ' ' + build.champ.name.toUpperCase();
+  var string = build.adjective.toUpperCase();
   var skills = '';
   for (var i = 0; i < build.skills.order.length; i++) {
     skills += build.skills.order[i] + ' > ';
