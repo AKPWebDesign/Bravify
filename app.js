@@ -242,27 +242,35 @@ function getPrefDir() {
 }
 
 function openChampSelect() {
-  champSelectWindow = new BrowserWindow({
-    width: 557,
-    height: 647,
-    fullscreen: false,
-    center: true,
-    resizable: false,
-    show: false,
-    frame: false,
-    transparent: true,
-    icon: __dirname + '/resources/icon.png',
-    title: 'Bravify Champ Select'});
+  if(!champSelectWindow) {
+    var w = 557;
+    var h = 647;
+    var loc = getNewWindowLocation(mainWindow, w, h);
+    champSelectWindow = new BrowserWindow({
+      width: w,
+      height: h,
+      fullscreen: false,
+      x: loc.x,
+      y: loc.y,
+      resizable: false,
+      show: false,
+      frame: false,
+      transparent: true,
+      icon: __dirname + '/resources/icon.png',
+      title: 'Bravify Champ Select'});
 
-  champSelectWindow.loadURL('file://' + __dirname + '/html/champions.html');
+    champSelectWindow.loadURL('file://' + __dirname + '/html/champions.html');
 
-  champSelectWindow.webContents.on('did-finish-load', function(){
-    champSelectWindow.show();
-  });
+    champSelectWindow.webContents.on('did-finish-load', function(){
+      champSelectWindow.show();
+    });
 
-  champSelectWindow.on('closed', function(){
-    champSelectWindow = null;
-  });
+    champSelectWindow.on('closed', function(){
+      champSelectWindow = null;
+    });
+  } else {
+      champSelectWindow.close();
+  }
 }
 
 function loadData(window) {
