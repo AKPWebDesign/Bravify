@@ -17,68 +17,71 @@ const fs = require('fs'); // filesystem tools
 const jsonfile = require('jsonfile'); //tools for saving JSON to files.
 const mkdirp = require('mkdirp'); //recursive mkdir
 const homedir = require('homedir'); //home directory finder
+var Promise = require('bluebird'); // jshint ignore:line
 
-// Load data from Riot APIs when we start the application.
-const APIData = new (require('./API/APIData'))(getPrefDir());
-const BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
-const ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
+var APIData, BuildGenerator, ItemSetGenerator;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
 var champSelectWindow = null;
 
-// Quit when all windows are closed.
-app.on('window-all-closed', function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function() {
-  var w = 1050;
-  var h = 600;
-  var loc = getNewWindowLocation(null, w, h);
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: w,
-    height: h,
-    'min-width': w,
-    'min-height': h,
-    fullscreen: false,
-    x: loc.x,
-    y: loc.y,
-    resizable: true,
-    show: false,
-    frame: false,
-    transparent: true,
-    icon: __dirname + '/resources/icon.png',
-    title: 'Bravify'});
-
-  // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/html/index.html');
-
-  mainWindow.webContents.on('did-finish-load', function(){
-    mainWindow.show();
-    //begin loading API data.
-    loadData();
-  });
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-    if(champSelectWindow) {
-      champSelectWindow.close();
+//create window, then run autoupdater, then start application.
+new Promise(function(resolve){
+  // Quit when all windows are closed.
+  app.on('window-all-closed', function() {
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+      app.quit();
     }
-    app.quit();
   });
+
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  app.on('ready', function() {
+    var w = 1050;
+    var h = 600;
+    var loc = getNewWindowLocation(null, w, h);
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+      width: w,
+      height: h,
+      'min-width': w,
+      'min-height': h,
+      fullscreen: false,
+      x: loc.x,
+      y: loc.y,
+      resizable: true,
+      show: false,
+      frame: false,
+      transparent: true,
+      icon: __dirname + '/resources/icon.png',
+      title: 'Bravify'});
+
+    // and load the index.html of the app.
+    mainWindow.loadURL('file://' + __dirname + '/html/index.html');
+
+    mainWindow.webContents.on('did-finish-load', function(){
+      mainWindow.show();
+      resolve(mainWindow);
+    });
+  });
+}).then(function(window) {
+  return require('./API/Autoupdate')(window);
+}).then(function(updated) {
+  if(updated) {return;} // Do this to stop the main load from happening if we're updating.
+  // Load data from Riot APIs when we start the application.
+  APIData = new (require('./API/APIData'))(getPrefDir());
+  BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
+  ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
+
+  //load API data to window.
+  loadData(mainWindow);
+
+}, function(err) {
+  dialog.showErrorBox('Bravify Error!', 'An error has occurred:\n' + err);
+  process.exit(1);
 });
 
 function deleteBuild() {
@@ -238,47 +241,40 @@ function getPrefDir() {
   return dir;
 }
 
-function openChampSelectWindow() {
-  if(!champSelectWindow) {
-    var w = 557;
-    var h = 647;
-    var loc = getNewWindowLocation(mainWindow, w, h);
-    champSelectWindow = new BrowserWindow({
-      width: w,
-      height: h,
-      fullscreen: false,
-      x: loc.x,
-      y: loc.y,
-      resizable: false,
-      show: false,
-      frame: false,
-      transparent: true,
-      icon: __dirname + '/resources/icon.png',
-      title: 'Bravify Champ Select'});
+function openChampSelect() {
+  champSelectWindow = new BrowserWindow({
+    width: 557,
+    height: 647,
+    fullscreen: false,
+    center: true,
+    resizable: false,
+    show: false,
+    frame: false,
+    transparent: true,
+    icon: __dirname + '/resources/icon.png',
+    title: 'Bravify Champ Select'});
 
-    champSelectWindow.loadURL('file://' + __dirname + '/html/champions.html');
+  champSelectWindow.loadURL('file://' + __dirname + '/html/champions.html');
 
-    champSelectWindow.webContents.on('did-finish-load', function(){
-      champSelectWindow.show();
-    });
+  champSelectWindow.webContents.on('did-finish-load', function(){
+    champSelectWindow.show();
+  });
 
-    champSelectWindow.on('closed', function(){
-      champSelectWindow = null;
-    });
-  } else {
-      champSelectWindow.close();
-  }
+  champSelectWindow.on('closed', function(){
+    champSelectWindow = null;
+  });
 }
 
-function loadData() {
+function loadData(window) {
+  window.webContents.send('startDataLoad');
   APIData.loadAll(function(index, length) {
     var percent = index/length;
-    mainWindow.webContents.send('updateProgressBar', percent);
+    window.webContents.send('updateProgressBar', percent);
   }).then(function() {
-    mainWindow.webContents.send('finishedLoading', true);
+    window.webContents.send('finishedLoading', true);
   }, function(error) {
     if(error === 'offline') {
-      mainWindow.webContents.send('offline');
+      window.webContents.send('offline');
     } else {
       console.log('Error: ' + error); //TODO: Handle errors better.
     }
@@ -320,7 +316,8 @@ ipcMain.on('maximize-main-window', function() {
 });
 
 ipcMain.on('openChampSelect', function() {
-  openChampSelectWindow();
+  if(champSelectWindow){champSelectWindow.close();return;}
+  openChampSelect();
 });
 
 ipcMain.on('retrieveChamps', function() {
@@ -340,7 +337,7 @@ ipcMain.on('closeChampsWindow', function() {
 });
 
 ipcMain.on('reloadData', function() {
-  loadData();
+  loadData(mainWindow);
 });
 
 ipcMain.on('openURL', function(event, message) {
