@@ -13,6 +13,12 @@ module.exports = function(window){
   return new Promise(function(resolve) {
     var pkg = require('../package.json');
 
+    //if we're running from 'electron', then we're developing.
+    if(path.basename(process.execPath).toLowerCase().startsWith('electron')) {
+      resolve(false);
+      return;
+    }
+
     //check for updated version
     checkForUpdate('v'+pkg.version).then(function(res) {
       //if res is false, we don't need to download.
