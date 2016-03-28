@@ -6,6 +6,7 @@ var baseImageURL = '';
 var champsByName = {};
 var groupData = {};
 var selectedChamps = [];
+var startTime = new Date().getTime();
 
 $(document).ready(function(){
   objectTemplate = Handlebars.compile($('#champ-template').html());
@@ -49,6 +50,8 @@ ipcRenderer.on('champions', function(event, message) {
       $(this).toggleClass('selected');
     });
   });
+  var time = new Date().getTime() - startTime;
+  ga('send', 'timing', 'Clientside Timing', 'Champion Page Load', time);
 });
 
 function createChampDiv(champ) {

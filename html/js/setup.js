@@ -5,6 +5,7 @@ const remote = require('electron').remote;
 const imagesLoaded = require('imagesloaded');
 const Handlebars = require('handlebars');
 const clipboard = require('clipboard');
+require('electron-cookies');
 
 //set up titlebar when document is ready.
 $(document).ready(function(){

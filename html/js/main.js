@@ -21,6 +21,7 @@ $('button.go').click(function() {
 $('button.copy').click(function() {
   if(currentBuild) {
     copyToClipboard(currentBuild);
+    ga('send', 'event', 'Clientside Actions', 'Copy to Clipboard');
   }
 });
 
@@ -47,6 +48,7 @@ $('.buttons .maps .dropdown-item').click(function() {
   var mode = ($(this).data('mode') || 'CLASSIC');
   mapData = {map: map, mode: mode};
   $('.buttons .maps .dropdown-toggle').text($(this).text());
+  ga('send', 'Clientside Actions', 'Map Selection Changed', $(this).text());
   $('button.go').click();
 });
 

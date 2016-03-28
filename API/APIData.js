@@ -6,9 +6,6 @@ const jsonfile = require('jsonfile');
 const fs = require('fs');
 const path = require('path');
 
-// TODO: What happens if the server goes down?
-// If we already have local data, we should use that. If not, we should tell the
-// user that the server is down, and to try again later.
 function APIData(dataPath) {
   this.dataPath = dataPath;
   this.versionData = {};
