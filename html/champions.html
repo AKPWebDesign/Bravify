@@ -2,6 +2,18 @@
 <head>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
   <link rel="stylesheet" href="css/style.css">
+  <!-- Google Analytics -->
+  <script>
+  require('electron-cookies'); //need electron-cookies for analytics to work.
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-33322212-16', 'auto');
+  ga('send', 'pageview', '/champions');
+  </script>
+  <!-- End Google Analytics -->
 </head>
 <body>
   <div class="app-container champions">
@@ -39,6 +51,7 @@
   <script src="js/champs.js"></script>
   <script src="js/tether.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
+  <script src="js/analytics.js"></script>
   <script id="champ-template" type="text/x-handlebars-template">
     <div class="champ-item-container {{selected}} {{champKey}}" data-key="{{champKey}}"><div class="champ-image" title="{{title}}" style="background-image: url({{url}})"></div><div class="champ-name">{{name}}</div></div>
   </script>
