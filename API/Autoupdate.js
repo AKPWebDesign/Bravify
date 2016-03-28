@@ -39,7 +39,7 @@ function checkForUpdate(currentVer) {
       resolve(body);
     });
   }).then(function(res) {
-    return (res.version !== currentVer) ? res.version : false;
+    return (versionCompare(res.version, currentVer) === 1) ? res.version : false;
   });
 }
 
@@ -125,4 +125,26 @@ function winMinorUpdate(app_asar, update_asar) {
     if(err) {console.error('Can\'t save update batch file!', err); return;}
     exec(`START "" "${batchFile}"`);
   });
+}
+
+function versionCompare(left, right) {
+  if(typeof left + typeof right !== 'stringstring') {
+    return false;
+  }
+
+  var a = left.split('.');
+  var b = right.split('.');
+  var i = 0;
+  var len = Math.max(a.length, b.length);
+
+  while(i < len) {
+    if(a[i] && !b[i] && parseInt(a[i]) > 0 || parseInt(a[i]) > parseInt(b[i])) {
+      return 1;
+    } else if(b[i] && !a[i] && parseInt(b[i]) > 0 || parseInt(a[i]) < parseInt(b[i])) {
+      return -1;
+    }
+    i++;
+  }
+
+  return 0;
 }
