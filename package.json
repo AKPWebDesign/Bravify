@@ -8,6 +8,7 @@
   },
   "author": "Austin Peterson <austin@akpwebdesign.com>",
   "license": "GPL-3.0",
+  "analytics-tracking-id": "UA-33322212-16",
   "devDependencies": {
     "asar": "^0.10.0",
     "electron-packager": "^5.2.1",
@@ -29,6 +30,8 @@
     "pretty-error": "^2.0.0",
     "request-json": "^0.5.5",
     "request-progress": "^2.0.1",
-    "titlebar": "^1.4.0"
+    "titlebar": "^1.4.0",
+    "universal-analytics": "^0.3.11",
+    "uuid": "^2.0.1"
   }
 }

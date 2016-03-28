@@ -17,9 +17,28 @@ const fs = require('fs'); // filesystem tools
 const jsonfile = require('jsonfile'); //tools for saving JSON to files.
 const mkdirp = require('mkdirp'); //recursive mkdir
 const homedir = require('homedir'); //home directory finder
+const uuid = require('uuid'); //uuid generator
+const ua = require('universal-analytics'); //google analytics
 var Promise = require('bluebird'); // jshint ignore:line
 
 var APIData, BuildGenerator, ItemSetGenerator;
+
+//set up analytics
+GLOBAL.analytics = ua(require('./package.json')['analytics-tracking-id'], getAnalyticsID(), { //analytics is global, so I can access it from anywhere in the app.
+  https: true,
+  av: require('./package.json').version, // app version
+  an: 'Bravify' // app name
+});
+var analytics = GLOBAL.analytics;
+var startTime = new Date().getTime(); // the current time, for timing tracking purposes.
+analytics.pageview({
+  dp: '/', // page path
+  dt: 'Bravify v'+require('./package.json').version, // page title
+  dh: 'http://bravify.akpwebdesign.com/', // hostname
+  av: require('./package.json').version, // app version
+  an: 'Bravify', // app name
+  cd: process.platform // screen name. Since we don't have multiple screens, I'm using this for OS tracking.
+});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -30,11 +49,9 @@ var champSelectWindow = null;
 new Promise(function(resolve){
   // Quit when all windows are closed.
   app.on('window-all-closed', function() {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
+    setTimeout(function(){
       app.quit();
-    }
+    }, 1000); //allow time for last Analytics event to send.
   });
 
   // This method will be called when Electron has finished
@@ -64,13 +81,18 @@ new Promise(function(resolve){
 
     mainWindow.webContents.on('did-finish-load', function(){
       mainWindow.show();
+      mainWindow.webContents.send('analytics-id', getAnalyticsID());
+      var time = new Date().getTime() - startTime;
+      analytics.timing('App Timing', 'Time to open main window', time).send();
       resolve(mainWindow);
     });
   });
 }).then(function(window) {
   return require('./API/Autoupdate')(window);
 }).then(function(updated) {
-  if(updated) {return;} // Do this to stop the main load from happening if we're updating.
+  if(updated) {analytics.event('Updates', 'App Updating').send();return;} // Do this to stop the main load from happening if we're updating.
+  var time = new Date().getTime() - startTime;
+  analytics.timing('App Timing', 'Time to finish autoupdate check', time).send();
   // Load data from Riot APIs when we start the application.
   APIData = new (require('./API/APIData'))(getPrefDir());
   BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
@@ -80,8 +102,11 @@ new Promise(function(resolve){
   loadData(mainWindow);
 
 }, function(err) {
+  analytics.exception('Fatal Error: ' + err.message, true).send();
   dialog.showErrorBox('Bravify Error!', 'An error has occurred:\n' + err);
-  process.exit(1);
+  setTimeout(function(){
+    process.exit(1);
+  }, 1000); //allow time for last Analytics event to send.
 });
 
 function deleteBuild() {
@@ -104,6 +129,7 @@ function saveBuild(itemSet) {
   }
   jsonfile.writeFile(path.join(dir, 'BravifyItemSet.json'), itemSet, function(err) {
     if(err) {
+      analytics.exception('Error Saving Build File: ' + err.message).send();
       console.error(err);
     }
   });
@@ -241,6 +267,17 @@ function getPrefDir() {
   return dir;
 }
 
+function getAnalyticsID() {
+  var prefs = loadPreferences();
+  var id = prefs['analytics-id'];
+  if(id) {
+    prefs['analytics-id'] = uuid.v4();
+    savePreferences(prefs);
+  }
+
+  return prefs['analytics-id'];
+}
+
 function openChampSelect() {
   if(!champSelectWindow) {
     var w = 557;
@@ -273,20 +310,26 @@ function openChampSelect() {
   }
 }
 
-function loadData(window) {
+function loadData(window, loadTime) {
+  var start = loadTime || startTime;
   window.webContents.send('startDataLoad');
   APIData.loadAll(function(index, length) {
     var percent = index/length;
     window.webContents.send('updateProgressBar', percent);
   }).then(function() {
     window.webContents.send('finishedLoading', true);
+    var time = new Date().getTime() - start;
+    analytics.timing('App Timing', 'Time to finish loading data', time).send();
   }, function(error) {
     if(error === 'offline') {
       window.webContents.send('offline');
+      analytics.event('Network Error', 'Offline').send(); // Not exactly sure how this would ever work, but... we'll see.
     } else {
+      analytics.exception('Error: ' + error.message).send();
       console.log('Error: ' + error); //TODO: Handle errors better.
     }
   }).catch(function(error) {
+    analytics.exception('Exception: ' + error.message).send();
     console.log('Exception: ' + error); //TODO: Handle errors better.
   });
 }
@@ -312,45 +355,58 @@ function getNewWindowLocation(window, width, height) {
 // rendering thread. These are used to do things in the app when the user clicks
 // on things in the interface.
 ipcMain.on('close-main-window', function() {
-  app.quit();
+  analytics.event('Window Actions', 'Main Window Closed').send();
+  //hide window immediately.
+  mainWindow.hide();
+  setTimeout(function(){
+    app.quit();
+  }, 1000); //allow time for last Analytics event to send.
 });
 
 ipcMain.on('minimize-main-window', function() {
+  analytics.event('Window Actions', 'Main Window Minimized').send();
   mainWindow.minimize();
 });
 
 ipcMain.on('maximize-main-window', function() {
+  analytics.event('Window Actions', 'Main Window Maximized').send();
   (mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize()); // jshint ignore:line
 });
 
 ipcMain.on('openChampSelect', function() {
-  if(champSelectWindow){champSelectWindow.close();return;}
+  if(champSelectWindow){analytics.event('Window Actions', 'Champ Select Closed').send();champSelectWindow.close();return;}
+  analytics.event('Window Actions', 'Champ Select Opened').send();
   openChampSelect();
 });
 
 ipcMain.on('retrieveChamps', function() {
   if(!champSelectWindow) {return;}
+  analytics.event('App Actions', 'Champ Select Data Requested').send();
   champSelectWindow.webContents.send('champions', {champs: APIData.champs, versions: APIData.versionData, groups: require('./API/groups.json'), selected: APIData.champKeys});
 });
 
 ipcMain.on('newChampSelection', function(event, champs) {
   if(!champs) {return;}
+  analytics.event('App Actions', 'New Champ Selection Received').send();
   APIData.champKeys = champs;
   mainWindow.webContents.send('champsChanged');
 });
 
 ipcMain.on('closeChampsWindow', function() {
   if(!champSelectWindow) {return;}
+  analytics.event('Window Actions', 'Champ Select Closed').send();
   champSelectWindow.close();
 });
 
 ipcMain.on('reloadData', function() {
-  loadData(mainWindow);
+  analytics.event('App Actions', 'Data Reload Requested').send();
+  loadData(mainWindow, new Date().getTime());
 });
 
 ipcMain.on('openURL', function(event, message) {
   var open = require('open');
   if(message) {
+    analytics.event('App Actions', 'URL Opened', message).send();
     open(message);
   }
 });
@@ -359,6 +415,7 @@ ipcMain.on('openURL', function(event, message) {
 ipcMain.on('generateNewBuild', function(event, message) {
   BuildGenerator.generate(message).then(function(result) {
     mainWindow.webContents.send('buildGenerated', result);
+    analytics.event('Build Actions', 'Build Generated').send();
   });
 });
 
@@ -367,13 +424,16 @@ ipcMain.on('saveBuild', function(event, message) {
     var set = ItemSetGenerator.generate(message.build);
     saveBuild(set);
     mainWindow.webContents.send('itemSetSaved', set);
+    analytics.event('Build Actions', 'Build Saved').send();
   }
 });
 
 ipcMain.on('deleteBuild', function() {
   deleteBuild();
+  analytics.event('Build Actions', 'Build Saved').send();
 });
 
 ipcMain.on('changeLeaguePath', function() {
   getLeaguePath(false);
+  analytics.event('Build Actions', 'League Path Changed').send();
 });
