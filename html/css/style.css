@@ -80,7 +80,8 @@ html, body {
   background-size: cover;
   width: 64px;
   height: 64px;
-  border-image-source: url("../img/champ_border.png");
+  border: 3px solid #000;
+  border-image: url("../img/champ_border.png");
   border-image-slice: 2;
   border-image-repeat: stretch;
   margin-left: 18px;
@@ -88,13 +89,13 @@ html, body {
 }
 
 .champion-list-container .champ-item-container:hover .champ-image {
-  border-image-source: url("../img/champ_border_hover.png");
-  border-image-slice: 10;
+  border-image: url("../img/champ_border_hover.png");
+  border-image-slice: 5;
 }
 
 .champion-list-container .champ-item-container.selected .champ-image {
-  border-image-source: url("../img/champ_border_selected.png");
-  border-image-slice: 5;
+  border-image: url("../img/champ_border_selected.png");
+  border-image-slice: 3;
 }
 
 .champion-list-container .champ-item-container .champ-name {

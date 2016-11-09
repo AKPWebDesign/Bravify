@@ -8,9 +8,7 @@ pe.skipNodeFiles();
 pe.withoutColors();
 
 const electron = require('electron');
-const {app, BrowserWindow} = electron;
-const dialog = require('electron').dialog;
-const ipcMain = require('electron').ipcMain; // ipc main reference.
+const {app, BrowserWindow, dialog, ipcMain} = electron;
 const path = require('path'); // path tools
 const fs = require('fs'); // filesystem tools
 const jsonfile = require('jsonfile'); //tools for saving JSON to files.
@@ -63,8 +61,8 @@ new Promise(function(resolve){
     mainWindow = new BrowserWindow({
       width: w,
       height: h,
-      'min-width': w,
-      'min-height': h,
+      minWidth: w,
+      minHeight: h,
       fullscreen: false,
       x: loc.x,
       y: loc.y,
@@ -78,12 +76,16 @@ new Promise(function(resolve){
     // and load the index.html of the app.
     mainWindow.loadURL('file://' + __dirname + '/html/index.html');
 
-    mainWindow.webContents.on('did-finish-load', function(){
+    mainWindow.once('ready-to-show', function(){
       mainWindow.show();
       mainWindow.webContents.send('analytics-id', getAnalyticsID());
       var time = new Date().getTime() - startTime;
       analytics.timing('App Timing', 'Time to open main window', time).send();
       resolve(mainWindow);
+
+      if (process.env.DEBUG) {
+        mainWindow.toggleDevTools();
+      }
     });
   });
 }).then(function(window) {
@@ -283,6 +285,8 @@ function openChampSelect() {
     var h = 647;
     var loc = getNewWindowLocation(mainWindow, w, h);
     champSelectWindow = new BrowserWindow({
+      parent: mainWindow,
+      modal: true,
       width: w,
       height: h,
       fullscreen: false,
@@ -297,8 +301,11 @@ function openChampSelect() {
 
     champSelectWindow.loadURL('file://' + __dirname + '/html/champions.html');
 
-    champSelectWindow.webContents.on('did-finish-load', function(){
+    champSelectWindow.once('ready-to-show', function(){
       champSelectWindow.show();
+      if (process.env.DEBUG) {
+        champSelectWindow.toggleDevTools();
+      }
     });
 
     champSelectWindow.on('closed', function(){
