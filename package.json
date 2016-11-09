@@ -1,6 +1,6 @@
 {
   "name": "bravify",
-  "version": "1.2.3",
+  "version": "2.0.0-DEV",
   "description": "Creates a random Ultimate Bravery build for a champion in League of Legends, adding it to the proper folder for it to be loaded in game.",
   "main": "app.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "analytics-tracking-id": "UA-33322212-16",
   "devDependencies": {
     "asar": "^0.10.0",
-    "electron-packager": "^5.2.1",
+    "electron-packager": "^8.2.0",
     "electron-prebuilt": "^0.36.9",
     "glob": "^7.0.3",
     "moment": "^2.12.0",

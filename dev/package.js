@@ -23,7 +23,7 @@ var opts = {
   'name': 'Bravify',
   'out': './release',
   'overwrite': true,
-  'version': '0.37.2'
+  'version': '1.4.6'
 };
 
 packager(opts, function(err, appPath) {

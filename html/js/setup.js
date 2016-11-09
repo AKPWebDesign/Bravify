@@ -1,10 +1,8 @@
 //Declare variables.
 window.$ = window.jQuery = require('jquery');
-const ipcRenderer = require('electron').ipcRenderer;
-const remote = require('electron').remote;
+const {ipcRenderer, remote, clipboard} = require('electron');
 const imagesLoaded = require('imagesloaded');
 const Handlebars = require('handlebars');
-const clipboard = require('clipboard');
 require('electron-cookies');
 
 //set up titlebar when document is ready.

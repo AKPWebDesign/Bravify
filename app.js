@@ -8,9 +8,8 @@ pe.skipNodeFiles();
 pe.withoutColors();
 
 const electron = require('electron');
+const {app, BrowserWindow} = electron;
 const dialog = require('electron').dialog;
-const app = electron.app;  // Module to control application life.
-const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const ipcMain = require('electron').ipcMain; // ipc main reference.
 const path = require('path'); // path tools
 const fs = require('fs'); // filesystem tools
@@ -42,8 +41,8 @@ analytics.pageview({
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null;
-var champSelectWindow = null;
+let mainWindow = null;
+let champSelectWindow = null;
 
 //create window, then run autoupdater, then start application.
 new Promise(function(resolve){
