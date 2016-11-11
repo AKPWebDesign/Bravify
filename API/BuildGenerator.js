@@ -1,8 +1,10 @@
 var Promise = require('bluebird'); // jshint ignore:line
 var chance = new (require('chance'))();
+const BravifyAPI = new (require("./BravifyAPI"))();
 
 function BuildGenerator(APIData) {
   this.APIData = APIData;
+  this.BravifyAPI = BravifyAPI;
 
   this.adjectives = require('./Adjectives');
 
@@ -18,27 +20,28 @@ BuildGenerator.prototype.generate = function (mapData) {
   var self = this;
   var map = mapData.map;
   var mode = mapData.mode;
-  return new Promise(function(resolve) {
-    var skills, champ;
-    while(!skills) {
-      champ = self.genChamp();
-      skills = self.genSkills(champ);
+  var data = {};
+  return BravifyAPI.getChampion().then(champ => {
+    data.champ = champ;
+    while(!data.skills) {
+      data.skills = self.genSkills(champ);
     }
-    var spells = self.genSpells(mode);
-    var hasSmite = spells.includes(self.APIData.summonerSpells.SummonerSmite);
-    var items = self.genItems(champ.name, map, hasSmite, false); //TODO: Pull duplicatesAllowed value from UI.
-    var adjective = self.genAdjective(champ.name);
-    resolve({champ: champ, items: items, spells: spells, skills: skills, masteries: self.genMasteries(), adjective: adjective, versions: self.APIData.versionData});
+    return BravifyAPI.getSpells(mode);
+  }).then(spells => {
+    data.spells = spells;
+    data.items = self.genItems(data.champ.name, map, self.hasSmite(spells), false); //TODO: Pull duplicatesAllowed value from UI.
+    data.adjective = self.genAdjective(data.champ.name);
+    data.masteries = self.genMasteries();
+    data.versions = self.APIData.versionData;
+    return data;
   });
 };
 
-BuildGenerator.prototype.genChamp = function () {
-  return this.APIData.champs[chance.pickone(this.APIData.champKeys)];
-};
-
-BuildGenerator.prototype.genSpells = function (mode) {
-  var set = chance.pickset(this.APIData.summonerSpellKeys[mode], 2);
-  return set.map(s => this.APIData.summonerSpells[s]);
+BuildGenerator.prototype.hasSmite = function (spells) {
+  for (var i = 0; i < spells.length; i++) {
+    if(spells[i].id == 'SummonerSmite') {return true;}
+  }
+  return false;
 };
 
 BuildGenerator.prototype.genAdjective = function (champ) {
@@ -70,7 +73,7 @@ BuildGenerator.prototype.genSkills = function (champ) {
       skills[skillToKey[i]] = {
         image: champ.spells[i].image.full,
         name: champ.spells[i].name,
-        description: champ.spells[i].sanitizedDescription
+        description: champ.spells[i].description.replace(/<(?:.|\n)*?>/gm, ' ').replace(/\s\s+/g, ' ') // sanitize the description. very naive. might break things.
       };
       choices.push(skillToKey[i]);
     }
@@ -163,6 +166,12 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
       twoItemsBack = lastItem;
       lastItem = currentItem;
       currentItem = chance.pickone(items);
+      if(!this.APIData.items[currentItem]) {
+        if(base) {
+          currentItem = lastItem;
+          done = true;
+        }
+      }
     } else {
       //check map, make sure we can use this item on the map we selected.
       if(!this.APIData.items[currentItem].maps[map]) {
@@ -215,7 +224,7 @@ BuildGenerator.prototype.newItem = function (map, badTags, base) {
 
   //console.log(itemPath);
 
-  if(!item.gold.purchasable) {
+  if(!item || !item.gold.purchasable) {
     if(lastItem) {
       item = this.APIData.items[lastItem];
     } else {

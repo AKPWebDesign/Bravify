@@ -78,12 +78,12 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   $('.champ-skin-name').off();
 
   $('.champ-skin-name').click(function(){
-    ipcRenderer.send('openURL', `${artImageURL}splash/${champ.key}_${randomSkin.num}.jpg`);
+    ipcRenderer.send('openURL', `${artImageURL}splash/${champ.id}_${randomSkin.num}.jpg`);
   });
 
   //CHAMP-RELATED IMAGES
   $('.champ-icon').css('background-image', buildBackgroundImageURL(baseImageURL + 'champion/' + champ.image.full));
-  $('.app-container').css('background-image', buildBackgroundImageURL(`${artImageURL}splash/${champ.key}_${randomSkin.num}.jpg`));
+  $('.app-container').css('background-image', buildBackgroundImageURL(`${artImageURL}splash/${champ.id}_${randomSkin.num}.jpg`));
 
   //SPELLS
   $('.spells div').tooltip('dispose');
@@ -144,7 +144,7 @@ function createMasteriesSpans(masteries) {
 }
 
 function createSpellDiv(spell) {
-  var title = spell.name + ' - ' + spell.sanitizedDescription;
+  var title = spell.name + ' - ' + spell.description;
   var url = baseImageURL + 'spell/' + spell.image.full;
   var context = {type: 'spell', url: url, title: title};
   return createObjectDiv(context);
