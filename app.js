@@ -21,12 +21,12 @@ var Promise = require('bluebird'); // jshint ignore:line
 var BravifyAPI, APIData, BuildGenerator, ItemSetGenerator;
 
 //set up analytics
-GLOBAL.analytics = ua(require('./package.json')['analytics-tracking-id'], getAnalyticsID(), { //analytics is global, so I can access it from anywhere in the app.
+global.analytics = ua(require('./package.json')['analytics-tracking-id'], getAnalyticsID(), { //analytics is global, so I can access it from anywhere in the app.
   https: true,
   av: require('./package.json').version, // app version
   an: 'Bravify' // app name
 });
-var analytics = GLOBAL.analytics;
+var analytics = global.analytics;
 var startTime = new Date().getTime(); // the current time, for timing tracking purposes.
 analytics.pageview({
   dp: '/', // page path
