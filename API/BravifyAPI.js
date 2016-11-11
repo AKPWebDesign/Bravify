@@ -6,12 +6,22 @@ var Promise = require('bluebird'); // jshint ignore:line
 function BravifyAPI() {
   this.languages = ['en_US'];
   this.langData = {};
+  this.adjectives = [
+    "stupid",
+    "mid or feed",
+    "afk",
+    "reported"
+  ];
+  
   var self = this;
   this.getLanguages().then(langs => {
     self.languages = langs;
     return this.getLanguage(langs[0]);
   }).then(langData => {
     self.langData = langData;
+    return this.getAdjectives();
+  }).then(adjectives => {
+    self.adjectives = adjectives;
   });
 }
 
@@ -52,15 +62,13 @@ BravifyAPI.prototype.getLanguage = function (lang) {
   });
 };
 
-//TODO: Consider pulling all adjectives and using as local list to speed things up slightly.
-BravifyAPI.prototype.getAdjective = function () {
+BravifyAPI.prototype.getAdjectives = function () {
   return new Promise((res, rej) => {
-    client.get('/adjective/random', (e, r, body) => {
+    client.get('/adjective', (e, r, body) => {
       if(e) { return rej(e); }
       res(body);
     });
   });
 };
-
 
 module.exports = BravifyAPI;
