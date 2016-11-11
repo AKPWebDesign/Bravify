@@ -4,30 +4,24 @@ client.headers['User-Agent'] = 'AKPWebDesign/Bravify <https://github.com/AKPWebD
 var Promise = require('bluebird'); // jshint ignore:line
 
 function BravifyAPI() {
-  this.languages = ['en_US'];
-  this.langData = {};
   this.adjectives = [
     "stupid",
     "mid or feed",
     "afk",
     "reported"
   ];
-  
+
+  this.language = 'en_US';
+
   var self = this;
-  this.getLanguages().then(langs => {
-    self.languages = langs;
-    return this.getLanguage(langs[0]);
-  }).then(langData => {
-    self.langData = langData;
-    return this.getAdjectives();
-  }).then(adjectives => {
+  this.getAdjectives().then(adjectives => {
     self.adjectives = adjectives;
   });
 }
 
 BravifyAPI.prototype.getChampion = function (includeList) {
   return new Promise((res, rej) => {
-    client.get('/champion/en_US/random/full', (e, r, body) => {
+    client.get(`/champion/${this.language}/random/full`, (e, r, body) => {
       if(e) { return rej(e); }
       res(body);
     });
@@ -37,7 +31,7 @@ BravifyAPI.prototype.getChampion = function (includeList) {
 BravifyAPI.prototype.getSpells = function (mode) {
   if(!mode) { mode = 'CLASSIC'; } // Default mode: CLASSIC.
   return new Promise((res, rej) => {
-    client.get(`/summoner/en_US/${mode}/random/2`, (e, r, body) => {
+    client.get(`/summoner/${this.language}/${mode}/random/2`, (e, r, body) => {
       if(e) { return rej(e); }
       res(body);
     });
@@ -57,6 +51,7 @@ BravifyAPI.prototype.getLanguage = function (lang) {
   return new Promise((res, rej) => {
     client.get(`/language/${lang}`, (e, r, body) => {
       if(e) { return rej(e); }
+      body.languageCode = lang;
       res(body);
     });
   });

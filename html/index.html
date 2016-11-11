@@ -49,37 +49,14 @@
             <div class="clearfix"></div>
             <div class="skills"></div>
             <div class="clearfix"></div>
-            <div class="gold">Total Gold: 0</div>
+            <div class="gold">Cost: 0</div>
           </div>
           <div class="clearfix"></div>
         </div>
-        <div class="buttons">
-          <button class="go btn btn-primary btn-lg">Generate</button>
-          <div class="btn-group maps">
-            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Summoner's Rift
-            </button>
-            <div class="dropdown-menu">
-              <button class="dropdown-item" data-map="11" data-mode="CLASSIC">Summoner's Rift</button>
-              <button class="dropdown-item" data-map="10" data-mode="CLASSIC">Twisted Treeline</button>
-              <button class="dropdown-item" data-map="12" data-mode="ARAM">Howling Abyss</button>
-            </div>
-          </div>
-          <button class="champs btn btn-danger">Choose Champions</button>
-          <div class="btn-group save-group">
-            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Item Set Options
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-              <button class="dropdown-item saveBuild">Save Item Set</button>
-              <button class="dropdown-item deleteBuild">Delete Item Set</button>
-              <button class="dropdown-item changeLeaguePath">Change League Path</button>
-            </div>
-          </div>
-          <button class="copy btn btn-info">Copy to clipboard</button>
-        </div>
+        <div class="buttons"></div>
       </div>
       <div class="champ-skin-name"></div>
+      <div class="language-selector">English</div>
     </div>
   </div>
   <script src="js/tether.min.js"></script>
@@ -89,6 +66,31 @@
   <script src="js/main.js"></script>
   <script id="object-template" type="text/x-handlebars-template">
     <div class="{{type}}" data-toggle="tooltip" title="{{title}}" style="background-image: url({{url}})"><div class="inner">{{inner}}</div></div>
+  </script>
+  <script id="buttons-template" type="text/x-handlebars-template">
+    <button class="go btn btn-primary btn-lg">Generate</button>
+    <div class="btn-group maps">
+      <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{Map1}}
+      </button>
+      <div class="dropdown-menu">
+        <button class="dropdown-item" data-map="11" data-mode="CLASSIC">{{Map1}}</button>
+        <button class="dropdown-item" data-map="10" data-mode="CLASSIC">{{Map10}}</button>
+        <button class="dropdown-item" data-map="12" data-mode="ARAM">{{Map12}}</button>
+      </div>
+    </div>
+    <button class="champs btn btn-danger">{{categoryChampion}}</button>
+    <div class="btn-group save-group">
+      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Item Set Options
+      </button>
+      <div class="dropdown-menu dropdown-menu-right">
+        <button class="dropdown-item saveBuild">Save Item Set</button>
+        <button class="dropdown-item deleteBuild">Delete Item Set</button>
+        <button class="dropdown-item changeLeaguePath">Change League Path</button>
+      </div>
+    </div>
+    <button class="copy btn btn-info">Copy to clipboard</button>
   </script>
 </body>
 </html>

@@ -1,8 +1,7 @@
 var Promise = require('bluebird'); // jshint ignore:line
 var chance = new (require('chance'))();
-const BravifyAPI = new (require("./BravifyAPI"))();
 
-function BuildGenerator(APIData) {
+function BuildGenerator(APIData, BravifyAPI) {
   this.APIData = APIData;
   this.BravifyAPI = BravifyAPI;
 
@@ -19,16 +18,16 @@ BuildGenerator.prototype.generate = function (mapData) {
   var map = mapData.map;
   var mode = mapData.mode;
   var data = {};
-  return BravifyAPI.getChampion().then(champ => {
+  return this.BravifyAPI.getChampion().then(champ => {
     data.champ = champ;
     while(!data.skills) {
       data.skills = self.genSkills(champ);
     }
-    return BravifyAPI.getSpells(mode);
+    return this.BravifyAPI.getSpells(mode);
   }).then(spells => {
     data.spells = spells;
     data.items = self.genItems(data.champ.name, map, self.hasSmite(spells), false); //TODO: Pull duplicatesAllowed value from UI.
-    data.adjective = self.genAdjective(BravifyAPI.adjectives, data.champ.name);
+    data.adjective = self.genAdjective(this.BravifyAPI.adjectives, data.champ.name);
     data.masteries = self.genMasteries();
     data.versions = self.APIData.versionData;
     return data;

@@ -18,7 +18,7 @@ const uuid = require('uuid'); //uuid generator
 const ua = require('universal-analytics'); //google analytics
 var Promise = require('bluebird'); // jshint ignore:line
 
-var APIData, BuildGenerator, ItemSetGenerator;
+var BravifyAPI, APIData, BuildGenerator, ItemSetGenerator;
 
 //set up analytics
 GLOBAL.analytics = ua(require('./package.json')['analytics-tracking-id'], getAnalyticsID(), { //analytics is global, so I can access it from anywhere in the app.
@@ -96,7 +96,8 @@ new Promise(function(resolve){
   analytics.timing('App Timing', 'Time to finish autoupdate check', time).send();
   // Load data from Riot APIs when we start the application.
   APIData = new (require('./API/APIData'))(getPrefDir());
-  BuildGenerator = new (require('./API/BuildGenerator'))(APIData);
+  BravifyAPI = new (require("./API/BravifyAPI"))();
+  BuildGenerator = new (require('./API/BuildGenerator'))(APIData, BravifyAPI);
   ItemSetGenerator = new (require('./API/ItemSetGenerator'))();
 
   //load API data to window.
@@ -322,7 +323,12 @@ function loadData(window, loadTime) {
   APIData.loadAll(function(index, length) {
     var percent = index/length;
     window.webContents.send('updateProgressBar', percent);
-  }).then(function() {
+  }).then(() => {
+    return BravifyAPI.getLanguages();
+  }).then((languages) => {
+    return BravifyAPI.getLanguage(languages[0]);
+  }).then(function(langData) {
+    window.webContents.send('langData', langData);
     window.webContents.send('finishedLoading', true);
     var time = new Date().getTime() - start;
     analytics.timing('App Timing', 'Time to finish loading data', time).send();

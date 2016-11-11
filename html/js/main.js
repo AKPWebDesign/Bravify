@@ -1,55 +1,67 @@
 var baseImageURL = '';
 var artImageURL = '';
 var objectTemplate;
+var buttonsTemplate;
+var langTemplate;
 var currentBuild;
 var mapData = {map: 11, mode: 'CLASSIC'};
+var langData;
 
 $(document).ready(function() {
   objectTemplate = Handlebars.compile($('#object-template').html());
+  buttonsTemplate = Handlebars.compile($('#buttons-template').html());
 });
 
-$('button.reload').click(function() {
-  $('.offline-frame').fadeOut(250);
-  $('.loading-frame').fadeIn(250);
-  ipcRenderer.send('reloadData');
-});
+ipcRenderer.on('langData', function(e, data) {
+  langData = data;
+  $('.buttons').html(buttonsTemplate(data));
+  $('.language-selector').text(getLangNative(data));
 
-$('button.go').click(function() {
-  ipcRenderer.send('generateNewBuild', mapData);
-});
+  setTimeout(() => {
+    $('button.reload').click(function() {
+      $('.offline-frame').fadeOut(250);
+      $('.loading-frame').fadeIn(250);
+      ipcRenderer.send('reloadData');
+    });
 
-$('button.copy').click(function() {
-  if(currentBuild) {
-    copyToClipboard(currentBuild);
-    ga('send', 'event', 'Clientside Actions', 'Copy to Clipboard');
-  }
-});
+    $('button.go').click(function() {
+      ipcRenderer.send('generateNewBuild', mapData);
+    });
 
-$('.save-group button.saveBuild').click(function() {
-  if(currentBuild) {
-    ipcRenderer.send('saveBuild', {build: currentBuild});
-  }
-});
+    $('button.copy').click(function() {
+      if(currentBuild) {
+        copyToClipboard(currentBuild);
+        ga('send', 'event', 'Clientside Actions', 'Copy to Clipboard');
+      }
+    });
 
-$('.save-group button.changeLeaguePath').click(function(){
-  ipcRenderer.send('changeLeaguePath');
-});
+    $('.save-group button.saveBuild').click(function() {
+      if(currentBuild) {
+        ipcRenderer.send('saveBuild', {build: currentBuild});
+      }
+    });
 
-$('.save-group button.deleteBuild').click(function(){
-  ipcRenderer.send('deleteBuild');
-});
+    $('.save-group button.changeLeaguePath').click(function(){
+      ipcRenderer.send('changeLeaguePath');
+    });
 
-$('button.champs').click(function() {
-  ipcRenderer.send('openChampSelect');
-});
+    $('.save-group button.deleteBuild').click(function(){
+      ipcRenderer.send('deleteBuild');
+    });
 
-$('.buttons .maps .dropdown-item').click(function() {
-  var map = ($(this).data('map') || 11);
-  var mode = ($(this).data('mode') || 'CLASSIC');
-  mapData = {map: map, mode: mode};
-  $('.buttons .maps .dropdown-toggle').text($(this).text());
-  ga('send', 'Clientside Actions', 'Map Selection Changed', $(this).text());
-  $('button.go').click();
+    $('button.champs').click(function() {
+      ipcRenderer.send('openChampSelect');
+    });
+
+    $('.buttons .maps .dropdown-item').click(function() {
+      var map = ($(this).data('map') || 11);
+      var mode = ($(this).data('mode') || 'CLASSIC');
+      mapData = {map: map, mode: mode};
+      $('.buttons .maps .dropdown-toggle').text($(this).text());
+      ga('send', 'Clientside Actions', 'Map Selection Changed', $(this).text());
+      $('button.go').click();
+    });
+  }, 100);
 });
 
 ipcRenderer.on('champsChanged', function() {
@@ -73,7 +85,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
   var randomSkin = champ.skins[Math.floor(Math.random()*champ.skins.length)];
   var nameText = randomSkin.name;
   if(nameText === 'default') {nameText = champ.name;}
-  $('.champ-skin-name').text(nameText);
+  $('.champ-skin-name').html(nameText);
 
   $('.champ-skin-name').off();
 
@@ -103,7 +115,7 @@ ipcRenderer.on('buildGenerated', function(event, message) {
 
   $('.items div').tooltip();
 
-  $('.gold').text('Total Gold: ' + goldTotal);
+  $('.gold').text(`${langData.Cost_} ${goldTotal} ${langData.Gold}`);
 
   //SKILLS
   $('.skills').empty();
@@ -191,4 +203,25 @@ function copyToClipboard(build) {
   string = string.slice(0, -2) + '.';
 
   clipboard.writeText(string);
+}
+
+function getLangNative(langData) {
+  var natives = [];
+  var code = langData.languageCode.substring(0, 2);
+  if(code === 'zh') {
+    code = langData.languageCode;
+  }
+  for (var key in langData) {
+    if (langData.hasOwnProperty(key)) {
+      if(key.startsWith('native_')) {
+        var lang = key.substring(7);
+        if(lang === code) {
+          return langData[key];
+        }
+      }
+    }
+  }
+
+  //if we're still here, we don't have a valid language?
+  return "English"; //hope that's right.
 }
