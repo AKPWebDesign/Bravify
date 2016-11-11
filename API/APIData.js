@@ -9,12 +9,8 @@ const path = require('path');
 function APIData(dataPath) {
   this.dataPath = dataPath;
   this.versionData = {};
-  this.champs = {};
-  this.champKeys = [];
   this.items = {};
   this.itemKeys = [];
-  this.summonerSpells = {};
-  this.summonerSpellKeys = {};
 
   this.badItemGroups = [
     'BootsNormal',
@@ -112,8 +108,8 @@ APIData.prototype.loadAll = function (progressFunction) {
 APIData.prototype.loadFromServer = function (region, version, progressFunction) {
   var self = this;
   //Load all data using promises.
-  return Promise.each([this.loadChamps(region, version), this.loadItems(region, version),
-               this.loadSummonerSpells(region, version), this.loadVersionData(region, version)], function(result, index, length) {
+  return Promise.each([this.loadItems(region, version), this.loadVersionData(region, version)],
+               function(result, index, length) {
                  progressFunction(index, length);
                })
   .then(function(result){
@@ -134,13 +130,9 @@ APIData.prototype.loadFromCache = function (data, progressFunction) {
   var self = this;
   return new Promise(function(resolve) {
     //ezpz, just pull data from object.
-    self.champs = data.champs;
     self.items = data.items;
-    self.summonerSpells = data.spells;
     self.versionData = data.versions;
-    self.champKeys = data.champKeys;
     self.itemKeys = data.itemKeys;
-    self.summonerSpellKeys = data.summonerSpellKeys;
     resolve('All data loaded from cache.');
   }).then(function(){
     progressFunction(1, 1);
@@ -153,9 +145,7 @@ APIData.prototype.loadFromCache = function (data, progressFunction) {
 
 APIData.prototype.saveToCache = function (data) {
   var dataPath = this.dataPath;
-  data.champKeys = this.champKeys;
   data.itemKeys = this.itemKeys;
-  data.summonerSpellKeys = this.summonerSpellKeys;
   try {
     jsonfile.writeFileSync(path.join(dataPath, 'data.json'), data);
   } catch(e) {
@@ -170,22 +160,6 @@ APIData.prototype.loadVersionData = function () {
       if(err || (body.status && body.status === 'Error')) {reject(body); return;}
       self.versionData = body;
       resolve({key: 'versions', status: 'success', data: body});
-    });
-  });
-};
-
-APIData.prototype.loadChamps = function () {
-  var self = this;
-  return new Promise(function(resolve, reject) {
-    client.get(`/champs`, function(err, res, body){
-      if(err || (body.status && body.status === 'Error')) {reject(body); return;}
-      self.champs = body;
-      for (var key in body) {
-        if (body.hasOwnProperty(key)) {
-          self.champKeys.push(key);
-        }
-      }
-      resolve({key: 'champs', status: 'success', data: body});
     });
   });
 };
@@ -230,29 +204,6 @@ APIData.prototype.loadItems = function () {
         }
       }
       resolve({key: 'items', status: 'success', data: body});
-    });
-  });
-};
-
-APIData.prototype.loadSummonerSpells = function () {
-  var self = this;
-  return new Promise(function(resolve, reject) {
-    client.get(`/spells`, function(err, res, body){
-      if(err || (body.status && body.status === 'Error')) {reject(body); return;}
-      self.summonerSpells = body;
-      for(var key in body) {
-        if(body.hasOwnProperty(key)) {
-          for (var i = 0; i < body[key].modes.length; i++) {
-            var mode = body[key].modes[i];
-            if(!self.summonerSpellKeys[mode]) {
-              self.summonerSpellKeys[mode] = [];
-            }
-            self.summonerSpellKeys[mode].push(key);
-          }
-        }
-      }
-      //console.log(self.summonerSpellKeys);
-      resolve({key: 'spells', status: 'success', data: body});
     });
   });
 };
