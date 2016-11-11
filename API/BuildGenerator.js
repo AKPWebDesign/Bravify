@@ -6,8 +6,6 @@ function BuildGenerator(APIData) {
   this.APIData = APIData;
   this.BravifyAPI = BravifyAPI;
 
-  this.adjectives = require('./Adjectives');
-
   this.badItemTags = [
     'Boots',
     'Jungle',
@@ -30,7 +28,9 @@ BuildGenerator.prototype.generate = function (mapData) {
   }).then(spells => {
     data.spells = spells;
     data.items = self.genItems(data.champ.name, map, self.hasSmite(spells), false); //TODO: Pull duplicatesAllowed value from UI.
-    data.adjective = self.genAdjective(data.champ.name);
+    return BravifyAPI.getAdjective();
+  }).then(adj => {
+    data.adjective = self.genAdjective(adj.adjective, data.champ.name);
     data.masteries = self.genMasteries();
     data.versions = self.APIData.versionData;
     return data;
@@ -44,8 +44,7 @@ BuildGenerator.prototype.hasSmite = function (spells) {
   return false;
 };
 
-BuildGenerator.prototype.genAdjective = function (champ) {
-  var adj = chance.pickone(this.adjectives);
+BuildGenerator.prototype.genAdjective = function (adj, champ) {
   if(adj.includes("{champ}")) {
     adj = adj.replace(/{champ}/i, champ);
   } else {
