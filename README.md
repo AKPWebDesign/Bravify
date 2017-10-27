@@ -1,3 +1,5 @@
+# NOTICE: Bravify is no longer being maintained. Sorry for the inconvenience.
+
 # Bravify
 
 Bravify is a tool to generate builds for [Ultimate Bravery](http://customlol.wikia.com/wiki/Ultimate_Bravery), a custom game mode in League of Legends. While there already exists a [tool to generate builds](http://ultimate-bravery.com), I've found that the tool uses outdated information, and isn't generally the easiest to use, either. What Bravify does differently is that it uses the Riot Games API directly, allowing the information used to be always up-to-date.
